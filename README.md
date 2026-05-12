@@ -1,33 +1,33 @@
-# 🏥 VitaLink — Plataforma de Gestão em Saúde
+# VitaLink — Plataforma de Gestão em Saúde
 
 > Plataforma web completa para gerenciamento de consultas, pacientes, prontuários e monitoramento de saúde.
 
 ---
 
-## 📋 Descrição do Projeto
+## Descrição do Projeto
 
 O **VitaLink** é uma plataforma web voltada para clínicas e consultórios médicos de pequeno e médio porte, permitindo o gerenciamento digital de pacientes, agendamentos, prontuários eletrônicos e monitoramento de indicadores de saúde. A plataforma integra uma API externa de geolocalização para localizar clínicas e farmácias próximas ao paciente.
 
 ---
 
-## 🧑‍💻 Stack Tecnológica
+## Stack Tecnológica
 
 | Camada | Tecnologia | Justificativa |
 |---|---|---|
-| Front-end | React + TypeScript | Ecossistema maduro, tipagem estática, componentes reutilizáveis |
-| Estilização | Tailwind CSS | Alta produtividade, design responsivo sem CSS manual |
-| Back-end | Node.js + Express | JavaScript full-stack, baixa curva de aprendizado da equipe |
-| Banco de Dados | PostgreSQL | Dados relacionais com integridade referencial (pacientes, consultas, prontuários) |
+| Front-end | React + TypeScript 
+| Estilização | Tailwind CSS 
+| Back-end | Node.js + Express 
+| Banco de Dados | PostgreSQL 
 | ORM | Prisma | Type-safe, migrations automatizadas, excelente DX |
-| API Externa | OpenStreetMap / Nominatim | Geolocalização gratuita para localizar clínicas e farmácias próximas |
-| Autenticação | JWT + bcrypt | Padrão seguro para sessões stateless |
-| Testes | Jest + Supertest + Cypress | Cobertura unitária, integração e E2E |
-| Qualidade | SonarCloud | Análise estática: complexidade, duplicação, vulnerabilidades |
-| Versionamento | Git + GitHub | Padrão da indústria, CI/CD via GitHub Actions |
+| API Externa | OpenStreetMap / Nominatim 
+| Autenticação | JWT + bcrypt 
+| Testes | Jest + Supertest + Cypress 
+| Qualidade | SonarCloud 
+| Versionamento | Git + GitHub 
 
 ---
 
-## 🗂️ Estrutura do Repositório
+##  Estrutura do Repositório
 
 ```
 vitalink/
