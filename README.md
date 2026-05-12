@@ -153,11 +153,9 @@ npm run cypress:run    # modo headless (CI)
 
 ## 👥 Equipe
 
-Projeto desenvolvido para a disciplina de **Desenvolvimento Web** — Centro Universitário do Estado do Pará (CESUPA)  
-Curso de Engenharia de Computação
+Projeto desenvolvido para a disciplina de **Qualide de Software** — Centro Universitário do Estado do Pará (CESUPA)  
+Analice Alves Johnston Pinheiro
+Bernardo Lins Bentes
+Lucas Augusto Rodrigues
 
 ---
-
-## 📄 Licença
-
-MIT
