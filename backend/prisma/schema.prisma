@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===== MODELOS =====
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(RECEPTIONIST)
+  specialty String?
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  appointments Appointment[]
+  medicalRecords MedicalRecord[]
+  prescriptions Prescription[]
+
+  @@map("users")
+}
+
+enum Role {
+  DOCTOR
+  RECEPTIONIST
+  ADMIN
+}
+
+model Patient {
+  id        String   @id @default(cuid())
+  name      String
+  cpf       String   @unique
+  birthDate DateTime
+  gender    String
+  phone     String
+  email     String   @unique
+  address   String
+  latitude  Float?
+  longitude Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  appointments Appointment[]
+  medicalRecords MedicalRecord[]
+
+  @@map("patients")
+}
+
+model Appointment {
+  id        String   @id @default(cuid())
+  date      DateTime
+  status    AppointmentStatus @default(CONFIRMED)
+  notes     String?
+
+  doctorId  String
+  doctor    User     @relation(fields: [doctorId], references: [id])
+
+  patientId String
+  patient   Patient  @relation(fields: [patientId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  medicalRecord MedicalRecord?
+
+  @@map("appointments")
+}
+
+enum AppointmentStatus {
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  RESCHEDULED
+}
+
+model MedicalRecord {
+  id        String   @id @default(cuid())
+  mainComplaint String
+  history   String?
+  physicalExam String?
+  diagnosis String?
+  treatment String?
+
+  doctorId  String
+  doctor    User     @relation(fields: [doctorId], references: [id])
+
+  patientId String
+  patient   Patient  @relation(fields: [patientId], references: [id])
+
+  appointmentId String @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  prescriptions Prescription[]
+
+  @@map("medical_records")
+}
+
+model Prescription {
+  id        String   @id @default(cuid())
+  medication String
+  dosage    String
+  frequency String
+  duration  String
+  notes     String?
+
+  doctorId  String
+  doctor    User     @relation(fields: [doctorId], references: [id])
+
+  medicalRecordId String
+  medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@map("prescriptions")
+}
