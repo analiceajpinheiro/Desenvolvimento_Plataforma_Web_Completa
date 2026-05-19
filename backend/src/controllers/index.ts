@@ -5,6 +5,8 @@ import {
   patientService,
   appointmentService,
 } from '../services';
+import { medicalRecordService } from '../services';
+import { prescriptionService } from '../services';
 import { ValidationError, AppError } from '../utils/errors';
 
 // ===== AUTH CONTROLLER =====
@@ -387,6 +389,143 @@ export const appointmentController = {
       return res.status(200).json({
         success: true,
         data: slots,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+};
+
+// ===== MEDICAL RECORD CONTROLLER =====
+export const medicalRecordController = {
+  async getAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { patientId, doctorId } = req.query;
+      const records = await medicalRecordService.getAll({
+        ...(patientId && { patientId: patientId as string }),
+        ...(doctorId && { doctorId: doctorId as string }),
+      });
+      return res.status(200).json({
+        success: true,
+        data: records,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const record = await medicalRecordService.getById(req.params.id);
+      return res.status(200).json({
+        success: true,
+        data: record,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const record = await medicalRecordService.create(req.body);
+      return res.status(201).json({
+        success: true,
+        message: 'Prontuário criado com sucesso',
+        data: record,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const record = await medicalRecordService.update(req.params.id, req.body);
+      return res.status(200).json({
+        success: true,
+        message: 'Prontuário atualizado com sucesso',
+        data: record,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      await medicalRecordService.delete(req.params.id);
+      return res.status(200).json({
+        success: true,
+        message: 'Prontuário removido com sucesso',
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+};
+
+// ===== PRESCRIPTION CONTROLLER =====
+export const prescriptionController = {
+  async getByMedicalRecord(req: Request, res: Response, next: NextFunction) {
+    try {
+      const prescriptions = await prescriptionService.getByMedicalRecord(req.params.id);
+      return res.status(200).json({
+        success: true,
+        data: prescriptions,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const prescription = await prescriptionService.getById(req.params.id);
+      return res.status(200).json({
+        success: true,
+        data: prescription,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const prescription = await prescriptionService.create({
+        ...req.body,
+        medicalRecordId: req.params.id,
+      });
+      return res.status(201).json({
+        success: true,
+        message: 'Prescrição criada com sucesso',
+        data: prescription,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const prescription = await prescriptionService.update(req.params.id, req.body);
+      return res.status(200).json({
+        success: true,
+        message: 'Prescrição atualizada com sucesso',
+        data: prescription,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      await prescriptionService.delete(req.params.id);
+      return res.status(200).json({
+        success: true,
+        message: 'Prescrição removida com sucesso',
       });
     } catch (err) {
       next(err);

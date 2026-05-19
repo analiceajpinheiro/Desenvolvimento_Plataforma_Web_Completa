@@ -1,18 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export const Navbar: React.FC = () => {
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location.href = '/login';
-  };
-
-  const user = localStorage.getItem('user');
+  const { user, logout } = useAuth();
 
   return (
     <nav className="bg-blue-600 text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/dashboard" className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">VitaLink</h1>
         </Link>
 
@@ -27,11 +23,15 @@ export const Navbar: React.FC = () => {
             Dashboard
           </Link>
 
-          <div className="border-l border-blue-400 pl-6">
-            {user && <span className="text-sm">{user}</span>}
+          <div className="border-l border-blue-400 pl-6 flex items-center gap-3">
+            {user && (
+              <span className="text-sm text-blue-100">
+                {user.name}
+              </span>
+            )}
             <button
-              onClick={handleLogout}
-              className="ml-4 bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-lg transition"
+              onClick={logout}
+              className="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-lg transition"
             >
               Sair
             </button>

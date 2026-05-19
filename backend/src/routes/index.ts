@@ -5,6 +5,8 @@ import {
   patientController,
   appointmentController,
 } from '../controllers';
+import { medicalRecordController } from '../controllers';
+import { prescriptionController } from '../controllers';
 import { authMiddleware, roleMiddleware } from '../middlewares';
 
 const router = Router();
@@ -38,5 +40,23 @@ router.patch('/appointments/:id/cancel', authMiddleware, roleMiddleware(['DOCTOR
 router.get('/patients/:patientId/appointments', authMiddleware, appointmentController.getPatientAppointments);
 router.get('/doctors/:doctorId/appointments', authMiddleware, appointmentController.getDoctorAppointments);
 router.get('/doctors/:doctorId/available-slots', authMiddleware, appointmentController.getAvailableSlots);
+
+// ===== MEDICAL RECORD ROUTES =====
+router.get('/medical-records', authMiddleware, medicalRecordController.getAll);
+router.get('/medical-records/:id', authMiddleware, medicalRecordController.getById);
+router.post('/medical-records', authMiddleware, roleMiddleware(['DOCTOR', 'ADMIN']), medicalRecordController.create);
+router.put('/medical-records/:id', authMiddleware, roleMiddleware(['DOCTOR', 'ADMIN']), medicalRecordController.update);
+router.delete('/medical-records/:id', authMiddleware, roleMiddleware(['ADMIN']), medicalRecordController.delete);
+router.get('/patients/:id/medical-records', authMiddleware, (req, res, next) => {
+  req.query.patientId = req.params.id;
+  return medicalRecordController.getAll(req, res, next);
+});
+
+// ===== PRESCRIPTION ROUTES =====
+router.get('/medical-records/:id/prescriptions', authMiddleware, prescriptionController.getByMedicalRecord);
+router.post('/medical-records/:id/prescriptions', authMiddleware, roleMiddleware(['DOCTOR', 'ADMIN']), prescriptionController.create);
+router.get('/prescriptions/:id', authMiddleware, prescriptionController.getById);
+router.put('/prescriptions/:id', authMiddleware, roleMiddleware(['DOCTOR', 'ADMIN']), prescriptionController.update);
+router.delete('/prescriptions/:id', authMiddleware, roleMiddleware(['DOCTOR', 'ADMIN']), prescriptionController.delete);
 
 export default router;

@@ -123,6 +123,12 @@ Endpoint utilizado:
 GET https://nominatim.openstreetmap.org/search?q={endereço}&format=json&limit=5
 ```
 
+**Link oficial da API:** https://nominatim.openstreetmap.org
+**Documentação:** https://nominatim.org/release-docs/latest/api/Search/
+
+**Overpass API** (busca de clínicas próximas): https://overpass-api.de
+**Endpoint utilizado:** https://overpass-api.de/api/interpreter
+
 ---
 
 ## 📊 Telas da Aplicação (5 telas com CRUD completo)

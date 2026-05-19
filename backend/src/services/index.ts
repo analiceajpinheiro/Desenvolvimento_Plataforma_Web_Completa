@@ -13,6 +13,11 @@ import {
   NotFoundError,
 } from '../utils/errors';
 import axios from 'axios';
+import { medicalRecordRepository } from '../repositories';
+import { prescriptionRepository } from '../repositories';
+import { validateCreateMedicalRecordInput } from '../utils/validators';
+import { validateCreatePrescriptionInput } from '../utils/validators';
+import { ConflictError } from '../utils/errors';
 
 // ===== AUTH SERVICE =====
 export const authService = {
@@ -332,5 +337,67 @@ export const appointmentService = {
     }
 
     return availableSlots;
+  },
+};
+
+// ===== MEDICAL RECORD SERVICE =====
+export const medicalRecordService = {
+  async getAll(filters?: { patientId?: string; doctorId?: string; appointmentId?: string }) {
+    return await medicalRecordRepository.findAll(filters);
+  },
+
+  async getById(id: string) {
+    return await medicalRecordRepository.findById(id);
+  },
+
+  async create(data: any) {
+    validateCreateMedicalRecordInput(data);
+
+    // Validar que paciente e médico existem
+    await patientRepository.findById(data.patientId);
+    await userRepository.findById(data.doctorId);
+
+    // Verificar duplicidade: cada agendamento só pode ter um prontuário
+    const existing = await medicalRecordRepository.findByAppointmentId(data.appointmentId);
+    if (existing) {
+      throw new ConflictError('Já existe um prontuário para este agendamento');
+    }
+
+    return await medicalRecordRepository.create(data);
+  },
+
+  async update(id: string, data: any) {
+    return await medicalRecordRepository.update(id, data);
+  },
+
+  async delete(id: string) {
+    return await medicalRecordRepository.delete(id);
+  },
+};
+
+// ===== PRESCRIPTION SERVICE =====
+export const prescriptionService = {
+  async getByMedicalRecord(medicalRecordId: string) {
+    await medicalRecordRepository.findById(medicalRecordId);
+    return await prescriptionRepository.findByMedicalRecord(medicalRecordId);
+  },
+
+  async getById(id: string) {
+    return await prescriptionRepository.findById(id);
+  },
+
+  async create(data: any) {
+    validateCreatePrescriptionInput(data);
+    await medicalRecordRepository.findById(data.medicalRecordId);
+    await userRepository.findById(data.doctorId);
+    return await prescriptionRepository.create(data);
+  },
+
+  async update(id: string, data: any) {
+    return await prescriptionRepository.update(id, data);
+  },
+
+  async delete(id: string) {
+    return await prescriptionRepository.delete(id);
   },
 };

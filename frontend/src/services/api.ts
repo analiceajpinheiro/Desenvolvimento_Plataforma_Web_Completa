@@ -17,7 +17,7 @@ class ApiClient {
     // Interceptador de requisição - adiciona token
     this.client.interceptors.request.use(
       (config) => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('vitacase_token');
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -31,7 +31,8 @@ class ApiClient {
       (response) => response,
       (error: AxiosError) => {
         if (error.response?.status === 401) {
-          localStorage.removeItem('token');
+          localStorage.removeItem('vitacase_token');
+          localStorage.removeItem('vitacase_user');
           window.location.href = '/login';
         }
         return Promise.reject(error);

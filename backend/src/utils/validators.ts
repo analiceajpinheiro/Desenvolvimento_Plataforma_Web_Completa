@@ -138,3 +138,59 @@ export const validateCreateAppointmentInput = (data: any) => {
     throw new ValidationError(JSON.stringify(errors));
   }
 };
+
+export const validateCreateMedicalRecordInput = (data: any) => {
+  const errors: Record<string, string> = {};
+
+  if (!data.mainComplaint || data.mainComplaint.trim().length === 0) {
+    errors.mainComplaint = 'Queixa principal é obrigatória';
+  }
+
+  if (!data.patientId || data.patientId.trim().length === 0) {
+    errors.patientId = 'Paciente é obrigatório';
+  }
+
+  if (!data.doctorId || data.doctorId.trim().length === 0) {
+    errors.doctorId = 'Médico é obrigatório';
+  }
+
+  if (data.appointmentId !== undefined && data.appointmentId.trim().length === 0) {
+    errors.appointmentId = 'ID do agendamento inválido';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    throw new ValidationError(JSON.stringify(errors));
+  }
+};
+
+export const validateCreatePrescriptionInput = (data: any) => {
+  const errors: Record<string, string> = {};
+
+  if (!data.medication || data.medication.trim().length === 0) {
+    errors.medication = 'Medicamento é obrigatório';
+  }
+
+  if (!data.dosage || data.dosage.trim().length === 0) {
+    errors.dosage = 'Dosagem é obrigatória';
+  }
+
+  if (!data.frequency || data.frequency.trim().length === 0) {
+    errors.frequency = 'Frequência é obrigatória';
+  }
+
+  if (!data.duration || data.duration.trim().length === 0) {
+    errors.duration = 'Duração é obrigatória';
+  }
+
+  if (!data.medicalRecordId || data.medicalRecordId.trim().length === 0) {
+    errors.medicalRecordId = 'ID do prontuário é obrigatório';
+  }
+
+  if (!data.doctorId || data.doctorId.trim().length === 0) {
+    errors.doctorId = 'Médico é obrigatório';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    throw new ValidationError(JSON.stringify(errors));
+  }
+};

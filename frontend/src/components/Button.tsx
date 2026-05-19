@@ -13,6 +13,7 @@ export const Button: React.FC<ButtonProps> = ({
   loading = false,
   children,
   disabled,
+  className,
   ...props
 }) => {
   const baseStyles =
@@ -35,7 +36,7 @@ export const Button: React.FC<ButtonProps> = ({
     <button
       {...props}
       disabled={disabled || loading}
-      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]}`}
+      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className ?? ''}`}
     >
       {loading ? 'Carregando...' : children}
     </button>

@@ -6,3 +6,6 @@ export { Modal } from './Modal';
 export { Pagination } from './Pagination';
 export { LoadingSpinner } from './LoadingSpinner';
 export { Navbar } from './Navbar';
+export { ProtectedRoute } from './ProtectedRoute';
+export { PrescriptionCard } from './PrescriptionCard';
+export { PrescriptionForm } from './PrescriptionForm';

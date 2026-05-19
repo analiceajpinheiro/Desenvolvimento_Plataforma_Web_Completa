@@ -266,3 +266,198 @@ export const appointmentRepository = {
     });
   },
 };
+
+export const medicalRecordRepository = {
+  async findById(id: string) {
+    const record = await prisma.medicalRecord.findUnique({
+      where: { id },
+      include: {
+        patient: true,
+        doctor: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            specialty: true,
+            isActive: true,
+            createdAt: true,
+          },
+        },
+        prescriptions: true,
+      },
+    });
+    if (!record) throw new NotFoundError('Prontuário');
+    return record;
+  },
+
+  async findAll(filters?: { patientId?: string; doctorId?: string; appointmentId?: string }) {
+    const where: { patientId?: string; doctorId?: string; appointmentId?: string } = {};
+    if (filters?.patientId) where.patientId = filters.patientId;
+    if (filters?.doctorId) where.doctorId = filters.doctorId;
+    if (filters?.appointmentId) where.appointmentId = filters.appointmentId;
+
+    return await prisma.medicalRecord.findMany({
+      where,
+      include: {
+        patient: true,
+        doctor: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+            specialty: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  },
+
+  async findByAppointmentId(appointmentId: string) {
+    return await prisma.medicalRecord.findUnique({
+      where: { appointmentId },
+    });
+  },
+
+  async create(data: any) {
+    return await prisma.medicalRecord.create({
+      data,
+      include: {
+        patient: true,
+        doctor: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+            specialty: true,
+          },
+        },
+        prescriptions: true,
+      },
+    });
+  },
+
+  async update(id: string, data: any) {
+    await this.findById(id);
+    return await prisma.medicalRecord.update({
+      where: { id },
+      data,
+      include: {
+        patient: true,
+        doctor: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+            specialty: true,
+          },
+        },
+        prescriptions: true,
+      },
+    });
+  },
+
+  async delete(id: string) {
+    await this.findById(id);
+    return await prisma.medicalRecord.delete({
+      where: { id },
+    });
+  },
+};
+
+export const prescriptionRepository = {
+  async findByMedicalRecord(medicalRecordId: string) {
+    return await prisma.prescription.findMany({
+      where: { medicalRecordId },
+      include: {
+        doctor: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+            specialty: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  },
+
+  async findById(id: string) {
+    const prescription = await prisma.prescription.findUnique({
+      where: { id },
+      include: {
+        doctor: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+            specialty: true,
+          },
+        },
+        medicalRecord: true,
+      },
+    });
+    if (!prescription) throw new NotFoundError('Prescrição');
+    return prescription;
+  },
+
+  async create(data: {
+    medication: string;
+    dosage: string;
+    frequency: string;
+    duration: string;
+    notes?: string;
+    doctorId: string;
+    medicalRecordId: string;
+  }) {
+    return await prisma.prescription.create({
+      data,
+      include: {
+        doctor: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+            specialty: true,
+          },
+        },
+      },
+    });
+  },
+
+  async update(
+    id: string,
+    data: {
+      medication?: string;
+      dosage?: string;
+      frequency?: string;
+      duration?: string;
+      notes?: string;
+    }
+  ) {
+    await this.findById(id);
+    return await prisma.prescription.update({
+      where: { id },
+      data,
+      include: {
+        doctor: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+            specialty: true,
+          },
+        },
+      },
+    });
+  },
+
+  async delete(id: string) {
+    await this.findById(id);
+    return await prisma.prescription.delete({
+      where: { id },
+    });
+  },
+};

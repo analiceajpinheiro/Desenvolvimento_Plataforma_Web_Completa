@@ -1,5 +1,10 @@
+export { Login } from './Login';
 export { Dashboard } from './Dashboard';
 export { PatientsList } from './PatientsList';
 export { PatientsForm } from './PatientsForm';
 export { AppointmentsList } from './AppointmentsList';
 export { AppointmentsForm } from './AppointmentsForm';
+export { MedicalRecordsList } from './MedicalRecordsList';
+export { MedicalRecordsForm } from './MedicalRecordsForm';
+export { UsersList } from './UsersList';
+export { UsersForm } from './UsersForm';
