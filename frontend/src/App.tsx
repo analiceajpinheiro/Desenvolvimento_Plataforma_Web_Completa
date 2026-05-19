@@ -1,19 +1,33 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css';
-
-// Pages serão importadas conforme forem criadas
-// import Dashboard from './pages/Dashboard';
-// import Login from './pages/Login';
+import {
+  Dashboard,
+  PatientsList,
+  PatientsForm,
+  AppointmentsList,
+  AppointmentsForm,
+} from './pages';
 
 function App() {
   return (
     <Router>
       <div className="App">
         <Routes>
-          {/* <Route path="/" element={<Dashboard />} />
-          <Route path="/login" element={<Login />} /> */}
-          <Route path="/" element={<div>VitaLink - Bem-vindo!</div>} />
+          {/* Dashboard */}
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+
+          {/* Pacientes */}
+          <Route path="/patients" element={<PatientsList />} />
+          <Route path="/patients/new" element={<PatientsForm />} />
+          <Route path="/patients/:id/edit" element={<PatientsForm />} />
+
+          {/* Agendamentos */}
+          <Route path="/appointments" element={<AppointmentsList />} />
+          <Route path="/appointments/new" element={<AppointmentsForm />} />
+
+          {/* 404 */}
+          <Route path="*" element={<Dashboard />} />
         </Routes>
       </div>
     </Router>
