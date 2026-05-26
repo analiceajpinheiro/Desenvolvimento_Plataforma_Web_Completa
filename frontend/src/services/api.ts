@@ -40,23 +40,23 @@ class ApiClient {
     );
   }
 
-  get<T>(url: string) {
+  get<T = any>(url: string) {
     return this.client.get<T>(url);
   }
 
-  post<T>(url: string, data?: unknown) {
+  post<T = any>(url: string, data?: unknown) {
     return this.client.post<T>(url, data);
   }
 
-  put<T>(url: string, data?: unknown) {
+  put<T = any>(url: string, data?: unknown) {
     return this.client.put<T>(url, data);
   }
 
-  delete<T>(url: string) {
+  delete<T = any>(url: string) {
     return this.client.delete<T>(url);
   }
 
-  patch<T>(url: string, data?: unknown) {
+  patch<T = any>(url: string, data?: unknown) {
     return this.client.patch<T>(url, data);
   }
 }

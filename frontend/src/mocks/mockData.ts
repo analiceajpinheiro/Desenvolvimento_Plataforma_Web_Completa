@@ -1,4 +1,4 @@
-import { Patient, Appointment, User } from '../types';
+import { Patient, Appointment, User, AppointmentStatus, UserRole } from '../types';
 
 export const mockPatients: Patient[] = [
   {
@@ -43,7 +43,7 @@ export const mockAppointments: Appointment[] = [
   {
     id: '1',
     date: new Date(Date.now() + 86400000).toISOString(),
-    status: 'CONFIRMED',
+    status: AppointmentStatus.CONFIRMED,
     doctorId: 'doc1',
     patientId: '1',
     notes: 'Consulta de rotina',
@@ -53,7 +53,7 @@ export const mockAppointments: Appointment[] = [
   {
     id: '2',
     date: new Date(Date.now() + 172800000).toISOString(),
-    status: 'CONFIRMED',
+    status: AppointmentStatus.CONFIRMED,
     doctorId: 'doc2',
     patientId: '2',
     notes: 'Acompanhamento',
@@ -67,9 +67,9 @@ export const mockDoctors: User[] = [
     id: 'doc1',
     email: 'dr.joao@clinic.com',
     name: 'Dr. João Cardiologista',
-    password: 'hashed_password',
-    role: 'DOCTOR',
+    role: UserRole.DOCTOR,
     specialty: 'Cardiologia',
+    isActive: true,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -77,9 +77,9 @@ export const mockDoctors: User[] = [
     id: 'doc2',
     email: 'dra.maria@clinic.com',
     name: 'Dra. Maria Pediatra',
-    password: 'hashed_password',
-    role: 'DOCTOR',
+    role: UserRole.DOCTOR,
     specialty: 'Pediatria',
+    isActive: true,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Appointment } from '../types';
+import { Appointment, AppointmentStatus } from '../types';
 import { appointmentService } from '../services/appointmentService';
 import { mockAppointments } from '../mocks/mockData';
 
@@ -71,7 +71,7 @@ export const useAppointments = () => {
         const newAppointment: Appointment = {
           id: Date.now().toString(),
           ...appointmentData,
-          status: 'CONFIRMED',
+          status: AppointmentStatus.CONFIRMED,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -141,7 +141,7 @@ export const useAppointments = () => {
         if (existingAppointment) {
           const updated: Appointment = {
             ...existingAppointment,
-            status: 'CANCELLED',
+            status: AppointmentStatus.CANCELLED,
             updatedAt: new Date().toISOString(),
           };
           setAppointments((prev) =>
