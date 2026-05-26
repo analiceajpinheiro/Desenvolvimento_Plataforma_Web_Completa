@@ -207,7 +207,7 @@ describe('API Integration Tests', () => {
       ]);
 
       const response = await request(app)
-        .get('/api/patients/search?q=João')
+        .get('/api/patients/search?q=Jo%C3%A3o')
         .set('Authorization', 'Bearer valid-token');
 
       expect(response.status).toBe(200);
