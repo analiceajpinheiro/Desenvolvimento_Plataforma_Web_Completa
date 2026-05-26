@@ -165,5 +165,61 @@ describe('useSpecialties', () => {
 
       expect(result.current.error).toBe('Permissão negada');
     });
+
+    it('deve usar mensagem padrão ao deletar sem response de erro', async () => {
+      vi.mocked(specialtyService.deleteSpecialty).mockRejectedValue(new Error('Network error'));
+
+      const { result } = renderHook(() => useSpecialties());
+
+      await act(async () => {
+        try {
+          await result.current.deleteSpecialty('specialty-1');
+        } catch {}
+      });
+
+      expect(result.current.error).toBe('Erro ao remover especialidade');
+    });
+  });
+
+  describe('branches adicionais', () => {
+    it('fetchSpecialties sem pagination retorna total 0', async () => {
+      vi.mocked(specialtyService.listSpecialties).mockResolvedValue({ data: [] } as any);
+
+      const { result } = renderHook(() => useSpecialties());
+
+      await act(async () => {
+        await result.current.fetchSpecialties();
+      });
+
+      expect(result.current.total).toBe(0);
+    });
+
+    it('addSpecialty usa mensagem padrão sem response de erro', async () => {
+      vi.mocked(specialtyService.createSpecialty).mockRejectedValue(new Error('Network error'));
+
+      const { result } = renderHook(() => useSpecialties());
+
+      await act(async () => {
+        try {
+          await result.current.addSpecialty({ name: 'X' });
+        } catch {}
+      });
+
+      expect(result.current.error).toBe('Erro ao criar especialidade');
+    });
+
+    it('updateSpecialty usa mensagem padrão sem response de erro', async () => {
+      vi.mocked(specialtyService.updateSpecialty).mockRejectedValue(new Error('Network error'));
+
+      const { result } = renderHook(() => useSpecialties());
+
+      await act(async () => {
+        try {
+          await result.current.updateSpecialty('specialty-1', { name: 'X' });
+        } catch {}
+      });
+
+      expect(result.current.error).toBe('Erro ao atualizar especialidade');
+    });
   });
 });

@@ -188,5 +188,61 @@ describe('useUsers', () => {
 
       expect(result.current.error).toBe('Permissão negada');
     });
+
+    it('deve usar mensagem padrão ao deletar sem resposta de erro', async () => {
+      vi.mocked(userService.delete).mockRejectedValue(new Error('Network error'));
+
+      const { result } = renderHook(() => useUsers());
+
+      await act(async () => {
+        try {
+          await result.current.deleteUser('user-1');
+        } catch {}
+      });
+
+      expect(result.current.error).toBe('Erro ao remover usuário');
+    });
+  });
+
+  describe('branches adicionais', () => {
+    it('fetchUsers sem pagination retorna total 0', async () => {
+      vi.mocked(userService.getAll).mockResolvedValue({ success: true, data: [] } as any);
+
+      const { result } = renderHook(() => useUsers());
+
+      await act(async () => {
+        await result.current.fetchUsers();
+      });
+
+      expect(result.current.total).toBe(0);
+    });
+
+    it('createUser usa mensagem padrão sem response de erro', async () => {
+      vi.mocked(userService.create).mockRejectedValue(new Error('Network error'));
+
+      const { result } = renderHook(() => useUsers());
+
+      await act(async () => {
+        try {
+          await result.current.createUser({ name: 'X', email: 'x@x.com', password: 'X@1234', role: 'ADMIN' });
+        } catch {}
+      });
+
+      expect(result.current.error).toBe('Erro ao criar usuário');
+    });
+
+    it('updateUser usa mensagem padrão sem response de erro', async () => {
+      vi.mocked(userService.update).mockRejectedValue(new Error('Network error'));
+
+      const { result } = renderHook(() => useUsers());
+
+      await act(async () => {
+        try {
+          await result.current.updateUser('user-1', { name: 'X' });
+        } catch {}
+      });
+
+      expect(result.current.error).toBe('Erro ao atualizar usuário');
+    });
   });
 });

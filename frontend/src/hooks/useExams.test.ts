@@ -188,5 +188,61 @@ describe('useExams', () => {
 
       expect(result.current.error).toBe('Permissão negada');
     });
+
+    it('deve usar mensagem padrão ao deletar sem response de erro', async () => {
+      vi.mocked(examService.deleteExam).mockRejectedValue(new Error('Network error'));
+
+      const { result } = renderHook(() => useExams());
+
+      await act(async () => {
+        try {
+          await result.current.deleteExam('exam-1');
+        } catch {}
+      });
+
+      expect(result.current.error).toBe('Erro ao remover exame');
+    });
+  });
+
+  describe('branches adicionais', () => {
+    it('fetchExams sem pagination retorna total 0', async () => {
+      vi.mocked(examService.listExams).mockResolvedValue({ data: [] } as any);
+
+      const { result } = renderHook(() => useExams());
+
+      await act(async () => {
+        await result.current.fetchExams();
+      });
+
+      expect(result.current.total).toBe(0);
+    });
+
+    it('addExam usa mensagem padrão sem response de erro', async () => {
+      vi.mocked(examService.createExam).mockRejectedValue(new Error('Network error'));
+
+      const { result } = renderHook(() => useExams());
+
+      await act(async () => {
+        try {
+          await result.current.addExam({ name: 'X', type: 'LAB' as any, status: 'REQUESTED' as any, patientId: 'p1', doctorId: 'd1' });
+        } catch {}
+      });
+
+      expect(result.current.error).toBe('Erro ao criar exame');
+    });
+
+    it('updateExam usa mensagem padrão sem response de erro', async () => {
+      vi.mocked(examService.updateExam).mockRejectedValue(new Error('Network error'));
+
+      const { result } = renderHook(() => useExams());
+
+      await act(async () => {
+        try {
+          await result.current.updateExam('exam-1', { status: 'COMPLETED' as any });
+        } catch {}
+      });
+
+      expect(result.current.error).toBe('Erro ao atualizar exame');
+    });
   });
 });

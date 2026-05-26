@@ -192,5 +192,63 @@ describe('useHealthPlans', () => {
 
       expect(result.current.error).toBe('Permissão negada');
     });
+
+    it('deve usar mensagem padrão ao deletar sem response de erro', async () => {
+      vi.mocked(healthPlanService.deleteHealthPlan).mockRejectedValue(new Error('Network error'));
+
+      const { result } = renderHook(() => useHealthPlans());
+
+      await act(async () => {
+        try {
+          await result.current.deleteHealthPlan('plan-1');
+        } catch {}
+      });
+
+      expect(result.current.error).toBe('Erro ao remover convênio');
+    });
+  });
+
+  describe('branches adicionais', () => {
+    it('fetchHealthPlans sem pagination retorna total 0', async () => {
+      vi.mocked(healthPlanService.listHealthPlans).mockResolvedValue({ data: [] } as any);
+
+      const { result } = renderHook(() => useHealthPlans());
+
+      await act(async () => {
+        await result.current.fetchHealthPlans();
+      });
+
+      expect(result.current.total).toBe(0);
+    });
+
+    it('addHealthPlan usa mensagem padrão sem response de erro', async () => {
+      vi.mocked(healthPlanService.createHealthPlan).mockRejectedValue(new Error('Network error'));
+
+      const { result } = renderHook(() => useHealthPlans());
+
+      await act(async () => {
+        try {
+          await result.current.addHealthPlan({
+            planName: 'X', provider: 'Y', planNumber: '000', validUntil: '2026-01-01', patientId: 'p1',
+          });
+        } catch {}
+      });
+
+      expect(result.current.error).toBe('Erro ao criar convênio');
+    });
+
+    it('updateHealthPlan usa mensagem padrão sem response de erro', async () => {
+      vi.mocked(healthPlanService.updateHealthPlan).mockRejectedValue(new Error('Network error'));
+
+      const { result } = renderHook(() => useHealthPlans());
+
+      await act(async () => {
+        try {
+          await result.current.updateHealthPlan('plan-1', { planName: 'X' });
+        } catch {}
+      });
+
+      expect(result.current.error).toBe('Erro ao atualizar convênio');
+    });
   });
 });

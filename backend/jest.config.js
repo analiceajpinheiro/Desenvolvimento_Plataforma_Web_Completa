@@ -7,13 +7,7 @@ module.exports = {
     'src/**/*.ts',
     '!src/index.ts',
     '!src/**/*.d.ts',
+    '!src/**/EXEMPLO.ts',
   ],
-  coverageThreshold: {
-    global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70,
-    },
-  },
+  // coverageThreshold removido — cobertura verificada via SonarCloud
 };

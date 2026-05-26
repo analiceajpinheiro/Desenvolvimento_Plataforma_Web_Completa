@@ -174,6 +174,34 @@
 - **Saída Esperada:** Status alterado para CANCELLED
 - **Status:** ⏳ A Implementar
 
+#### CT-I-008: useUsers - Carregar e Gerenciar Usuários
+- **Objetivo:** Testar CRUD completo via hook useUsers
+- **Setup:** `vi.mock` do userService com Vitest
+- **Ação:** Chamar `fetchUsers`, `createUser`, `updateUser`, `deleteUser`
+- **Saída Esperada:** Estado atualizado corretamente após cada operação
+- **Status:** ✅ Implementado (`useUsers.test.ts`)
+
+#### CT-I-009: useExams - Carregar e Gerenciar Exames
+- **Objetivo:** Testar CRUD completo via hook useExams
+- **Setup:** `vi.mock` do examService com Vitest
+- **Ação:** Chamar `fetchExams`, `addExam`, `updateExam`, `deleteExam`
+- **Saída Esperada:** Estado atualizado corretamente após cada operação
+- **Status:** ✅ Implementado (`useExams.test.ts`)
+
+#### CT-I-010: useSpecialties - Carregar e Gerenciar Especialidades
+- **Objetivo:** Testar CRUD completo via hook useSpecialties
+- **Setup:** `vi.mock` do specialtyService com Vitest
+- **Ação:** Chamar `fetchSpecialties`, `addSpecialty`, `updateSpecialty`, `deleteSpecialty`
+- **Saída Esperada:** Estado atualizado corretamente após cada operação
+- **Status:** ✅ Implementado (`useSpecialties.test.ts`)
+
+#### CT-I-011: useHealthPlans - Carregar e Gerenciar Convênios
+- **Objetivo:** Testar CRUD completo via hook useHealthPlans
+- **Setup:** `vi.mock` do healthPlanService com Vitest
+- **Ação:** Chamar `fetchHealthPlans`, `addHealthPlan`, `updateHealthPlan`, `deleteHealthPlan`
+- **Saída Esperada:** Estado atualizado corretamente após cada operação
+- **Status:** ✅ Implementado (`useHealthPlans.test.ts`)
+
 ---
 
 ## 🌐 Testes E2E - Cypress
@@ -361,9 +389,9 @@ npx cypress run --spec "cypress/e2e/patients.cy.ts"
 | Tipo | Total | Implementados | Status |
 |------|-------|---------------|--------|
 | Unitários | 16 | 16 | ✅ 100% |
-| Integração | 7 | 0 | ⏳ 0% |
+| Integração (hooks) | 11 | 4 | ⏳ 36% |
 | E2E | 17 | 17 | ✅ 100% |
-| **Total** | **40** | **33** | **⏳ 82.5%** |
+| **Total** | **44** | **37** | **⏳ 84%** |
 
 ---
 
