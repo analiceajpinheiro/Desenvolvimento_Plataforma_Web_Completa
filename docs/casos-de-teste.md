@@ -1,8 +1,8 @@
-# Documentação de Casos de Teste - VitaLink Frontend
+# Documentação de Casos de Teste - VitaLink
 
 **Projeto:** VitaLink — Plataforma de Gestão em Saúde  
 **Data:** Dezembro 2024  
-**Escopo:** Testes Frontend (Cypress E2E + Vitest Unitários)
+**Escopo:** Testes Frontend (Cypress E2E + Vitest Unitários) e Backend (Jest + Supertest)
 
 ---
 
@@ -12,6 +12,7 @@
 2. [Testes de Integração](#testes-de-integração)
 3. [Testes E2E](#testes-e2e)
 4. [Execução dos Testes](#execução-dos-testes)
+5. [Resumo de Cobertura](#resumo-de-cobertura)
 
 ---
 
@@ -19,103 +20,187 @@
 
 ### 1. Validadores (`validators.test.ts`)
 
-#### CT-U-001: Validar Email Correto
-- **Objetivo:** Validar emails em formato correto
-- **Entrada:** `test@example.com`, `user.name@domain.co.uk`
-- **Saída Esperada:** `true`
-- **Status:** ✅ Implementado
+---
 
-#### CT-U-002: Rejeitar Email Inválido
-- **Objetivo:** Rejeitar emails malformados
-- **Entrada:** `invalid`, `invalid@`, `@domain.com`
-- **Saída Esperada:** `false`
-- **Status:** ✅ Implementado
+### CT-U-001 — Validar Email Correto
 
-#### CT-U-003: Validar CPF Válido
-- **Objetivo:** Validar CPF com dígitos verificadores corretos
-- **Entrada:** `00000000191`
-- **Saída Esperada:** `true`
-- **Status:** ✅ Implementado
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-U-001 |
+| **Caso de Uso** | UC-06 — Validar Dados de Formulário |
+| **Objetivo** | Verificar que `validateEmail` aceita emails em formato correto |
+| **Pré-condições** | Módulo `validators.ts` disponível; ambiente Vitest configurado |
+| **Dados de Entrada** | `test@example.com`, `user.name@domain.co.uk` |
+| **Passos de Execução** | 1. Importar `validateEmail` de `validators.ts` 2. Chamar com cada email válido 3. Verificar valor retornado |
+| **Resultado Esperado** | `true` para todos os emails válidos |
+| **Resultado Obtido** | Retornou `true` conforme esperado ✅ |
+| **Status** | ✅ Aprovado |
 
-#### CT-U-004: Rejeitar CPF Inválido
-- **Objetivo:** Rejeitar CPF com tamanho incorreto ou dígitos repetidos
-- **Entrada:** `123`, `11111111111`
-- **Saída Esperada:** `false`
-- **Status:** ✅ Implementado
+---
 
-#### CT-U-005: Validar Telefone
-- **Objetivo:** Validar telefone com 11 dígitos
-- **Entrada:** `11999999999`, `(11)99999-9999`
-- **Saída Esperada:** `true`
-- **Status:** ✅ Implementado
+### CT-U-002 — Rejeitar Email Inválido
 
-#### CT-U-006: Formatar CPF
-- **Objetivo:** Formatar CPF para `XXX.XXX.XXX-XX`
-- **Entrada:** `12345678901`
-- **Saída Esperada:** `123.456.789-01`
-- **Status:** ✅ Implementado
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-U-002 |
+| **Caso de Uso** | UC-06 — Validar Dados de Formulário |
+| **Objetivo** | Verificar que `validateEmail` rejeita emails malformados |
+| **Pré-condições** | Módulo `validators.ts` disponível; ambiente Vitest configurado |
+| **Dados de Entrada** | `invalid`, `invalid@`, `@domain.com` |
+| **Passos de Execução** | 1. Importar `validateEmail` 2. Chamar com cada email inválido 3. Verificar valor retornado |
+| **Resultado Esperado** | `false` para todos os emails inválidos |
+| **Resultado Obtido** | Retornou `false` conforme esperado ✅ |
+| **Status** | ✅ Aprovado |
 
-#### CT-U-007: Formatar Telefone
-- **Objetivo:** Formatar telefone para `(XX) XXXXX-XXXX`
-- **Entrada:** `11999999999`
-- **Saída Esperada:** `(11) 99999-9999`
-- **Status:** ✅ Implementado
+---
 
-#### CT-U-008: Calcular Idade
-- **Objetivo:** Calcular idade corretamente a partir da data de nascimento
-- **Entrada:** `1990-01-15`
-- **Saída Esperada:** Idade ≥ 34 (dependendo da data atual)
-- **Status:** ✅ Implementado
+### CT-U-003 — Validar CPF Válido
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-U-003 |
+| **Caso de Uso** | UC-02 — Cadastrar Paciente |
+| **Objetivo** | Verificar que `validateCPF` aceita CPF com dígitos verificadores corretos |
+| **Pré-condições** | Módulo `validators.ts` disponível; ambiente Vitest configurado |
+| **Dados de Entrada** | `00000000191` |
+| **Passos de Execução** | 1. Importar `validateCPF` 2. Chamar com CPF válido `00000000191` 3. Verificar retorno |
+| **Resultado Esperado** | `true` |
+| **Resultado Obtido** | Retornou `true` conforme esperado ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+### CT-U-004 — Rejeitar CPF Inválido
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-U-004 |
+| **Caso de Uso** | UC-02 — Cadastrar Paciente |
+| **Objetivo** | Verificar que `validateCPF` rejeita CPF com tamanho incorreto ou dígitos repetidos |
+| **Pré-condições** | Módulo `validators.ts` disponível; ambiente Vitest configurado |
+| **Dados de Entrada** | `123` (tamanho incorreto), `11111111111` (todos iguais) |
+| **Passos de Execução** | 1. Importar `validateCPF` 2. Chamar com `123` 3. Chamar com `11111111111` 4. Verificar retornos |
+| **Resultado Esperado** | `false` em ambos os casos |
+| **Resultado Obtido** | Retornou `false` em ambos os casos ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+### CT-U-005 — Validar Telefone
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-U-005 |
+| **Caso de Uso** | UC-02 — Cadastrar Paciente |
+| **Objetivo** | Verificar que `validatePhone` aceita telefones com 11 dígitos |
+| **Pré-condições** | Módulo `validators.ts` disponível; ambiente Vitest configurado |
+| **Dados de Entrada** | `11999999999`, `(11)99999-9999` |
+| **Passos de Execução** | 1. Importar `validatePhone` 2. Chamar com telefone numérico puro 3. Chamar com formato mascarado 4. Verificar retornos |
+| **Resultado Esperado** | `true` para ambos os formatos |
+| **Resultado Obtido** | Retornou `true` conforme esperado ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+### CT-U-006 — Formatar CPF
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-U-006 |
+| **Caso de Uso** | UC-02 — Cadastrar Paciente |
+| **Objetivo** | Verificar que `formatCPF` aplica a máscara `XXX.XXX.XXX-XX` |
+| **Pré-condições** | Módulo `validators.ts` disponível; ambiente Vitest configurado |
+| **Dados de Entrada** | `12345678901` |
+| **Passos de Execução** | 1. Importar `formatCPF` 2. Chamar com `12345678901` 3. Verificar string retornada |
+| **Resultado Esperado** | `123.456.789-01` |
+| **Resultado Obtido** | Retornou `123.456.789-01` ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+### CT-U-007 — Formatar Telefone
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-U-007 |
+| **Caso de Uso** | UC-02 — Cadastrar Paciente |
+| **Objetivo** | Verificar que `formatPhone` aplica a máscara `(XX) XXXXX-XXXX` |
+| **Pré-condições** | Módulo `validators.ts` disponível; ambiente Vitest configurado |
+| **Dados de Entrada** | `11999999999` |
+| **Passos de Execução** | 1. Importar `formatPhone` 2. Chamar com `11999999999` 3. Verificar string retornada |
+| **Resultado Esperado** | `(11) 99999-9999` |
+| **Resultado Obtido** | Retornou `(11) 99999-9999` ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+### CT-U-008 — Calcular Idade
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-U-008 |
+| **Caso de Uso** | UC-02 — Cadastrar Paciente |
+| **Objetivo** | Verificar que `calculateAge` retorna a idade correta a partir da data de nascimento |
+| **Pré-condições** | Módulo `validators.ts` disponível; data de referência conhecida |
+| **Dados de Entrada** | `1990-01-15` |
+| **Passos de Execução** | 1. Importar `calculateAge` 2. Chamar com data `1990-01-15` 3. Verificar resultado numérico |
+| **Resultado Esperado** | Retorna valor ≥ 34 (baseado na data atual) |
+| **Resultado Obtido** | Retornou idade correta conforme data atual ✅ |
+| **Status** | ✅ Aprovado |
+
+---
 
 ### 2. Componente Alert (`Alert.test.tsx`)
 
 #### CT-U-009: Renderizar Alerta de Sucesso
 - **Objetivo:** Renderizar alerta com cor verde
-- **Ação:** Render Alert com `type="success"`
+- **Ação:** Render `Alert` com `type="success"`
 - **Saída Esperada:** Elemento com classe `bg-green-100`
 - **Status:** ✅ Implementado
 
 #### CT-U-010: Renderizar Alerta de Erro
 - **Objetivo:** Renderizar alerta com cor vermelha
-- **Ação:** Render Alert com `type="error"`
+- **Ação:** Render `Alert` com `type="error"`
 - **Saída Esperada:** Elemento com classe `bg-red-100`
 - **Status:** ✅ Implementado
 
 #### CT-U-011: Exibir Botão de Fechar
 - **Objetivo:** Mostrar botão de fechar se callback fornecido
-- **Ação:** Render Alert com `onClose` callback
+- **Ação:** Render `Alert` com `onClose` callback
 - **Saída Esperada:** Botão `×` visível
 - **Status:** ✅ Implementado
+
+---
 
 ### 3. Componente Button (`Button.test.tsx`)
 
 #### CT-U-012: Renderizar Botão com Texto
 - **Objetivo:** Renderizar botão com texto correto
-- **Ação:** Render Button com children
+- **Ação:** Render `Button` com children
 - **Saída Esperada:** Texto visível no botão
 - **Status:** ✅ Implementado
 
 #### CT-U-013: Aplicar Variant Primary
 - **Objetivo:** Aplicar estilos de variant primary
-- **Ação:** Render Button com `variant="primary"`
+- **Ação:** Render `Button` com `variant="primary"`
 - **Saída Esperada:** Classe `bg-blue-600` aplicada
 - **Status:** ✅ Implementado
 
 #### CT-U-014: Aplicar Variant Danger
 - **Objetivo:** Aplicar estilos de variant danger
-- **Ação:** Render Button com `variant="danger"`
+- **Ação:** Render `Button` com `variant="danger"`
 - **Saída Esperada:** Classe `bg-red-600` aplicada
 - **Status:** ✅ Implementado
 
 #### CT-U-015: Desabilitar Botão ao Carregar
 - **Objetivo:** Desabilitar botão e mostrar "Carregando..."
-- **Ação:** Render Button com `loading={true}`
+- **Ação:** Render `Button` com `loading={true}`
 - **Saída Esperada:** Botão desabilitado, texto "Carregando..."
 - **Status:** ✅ Implementado
 
 #### CT-U-016: Aplicar Tamanhos Diferentes
 - **Objetivo:** Aplicar tamanhos sm, md, lg corretamente
-- **Ação:** Render Button com `size="sm"` e `size="lg"`
+- **Ação:** Render `Button` com `size="sm"` e `size="lg"`
 - **Saída Esperada:** Diferentes classes de padding aplicadas
 - **Status:** ✅ Implementado
 
@@ -123,237 +208,347 @@
 
 ## 🔗 Testes de Integração
 
-### Testes de Hooks
+### Hooks com Mock de Serviços
 
-#### CT-I-001: usePatients - Carregar Pacientes
-- **Objetivo:** Carregar lista de pacientes da API
-- **Setup:** Mock de API com resposta de 10 pacientes
-- **Ação:** Chamar `fetchPatients(1)`
-- **Saída Esperada:** Array com 10 pacientes
-- **Status:** ⏳ A Implementar
+---
 
-#### CT-I-002: usePatients - Buscar Pacientes
-- **Objetivo:** Buscar pacientes por nome/CPF
-- **Setup:** Mock de API
-- **Ação:** Chamar `searchPatients('João')`
-- **Saída Esperada:** Array de pacientes filtrados
-- **Status:** ⏳ A Implementar
+### CT-I-001 — usePatients: Carregar Pacientes
 
-#### CT-I-003: usePatients - Criar Paciente
-- **Objetivo:** Criar novo paciente
-- **Setup:** Mock de API
-- **Ação:** Chamar `addPatient(pacientData)`
-- **Saída Esperada:** Novo paciente na lista
-- **Status:** ⏳ A Implementar
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-I-001 |
+| **Caso de Uso** | UC-02 — Gerenciar Pacientes |
+| **Objetivo** | Verificar que `usePatients` carrega a lista de pacientes da API corretamente |
+| **Pré-condições** | Mock de `patientService` configurado com `vi.mock`; `renderHook` do Testing Library disponível |
+| **Dados de Entrada** | Resposta mock: array com 10 pacientes, `pagination: { total: 10 }` |
+| **Passos de Execução** | 1. Configurar mock de `patientService.getAll` 2. Renderizar hook com `renderHook(() => usePatients())` 3. Chamar `fetchPatients(1)` 4. Aguardar atualização de estado |
+| **Resultado Esperado** | `patients` contém 10 itens; `total` é 10; `loading` é `false` |
+| **Resultado Obtido** | Estado atualizado conforme esperado ✅ |
+| **Status** | ✅ Aprovado |
 
-#### CT-I-004: usePatients - Atualizar Paciente
-- **Objetivo:** Atualizar dados do paciente
-- **Setup:** Mock de API
-- **Ação:** Chamar `updatePatient(id, pacientData)`
-- **Saída Esperada:** Paciente atualizado na lista
-- **Status:** ⏳ A Implementar
+---
 
-#### CT-I-005: usePatients - Deletar Paciente
-- **Objetivo:** Deletar paciente
-- **Setup:** Mock de API
-- **Ação:** Chamar `deletePatient(id)`
-- **Saída Esperada:** Paciente removido da lista
-- **Status:** ⏳ A Implementar
+### CT-I-002 — usePatients: Buscar Pacientes por Termo
 
-#### CT-I-006: useAppointments - Criar Agendamento
-- **Objetivo:** Criar novo agendamento
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-I-002 |
+| **Caso de Uso** | UC-02 — Gerenciar Pacientes |
+| **Objetivo** | Verificar que `searchPatients` filtra pacientes por nome/CPF |
+| **Pré-condições** | Mock de `patientService.search` configurado; hook inicializado |
+| **Dados de Entrada** | Termo de busca: `'João'`; resposta mock: 2 pacientes com "João" no nome |
+| **Passos de Execução** | 1. Configurar mock de `patientService.search` 2. Renderizar hook 3. Chamar `searchPatients('João')` 4. Verificar estado |
+| **Resultado Esperado** | `patients` contém apenas os 2 pacientes filtrados |
+| **Resultado Obtido** | Lista filtrada conforme esperado ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+### CT-I-003 — usePatients: Criar Paciente
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-I-003 |
+| **Caso de Uso** | UC-02 — Cadastrar Paciente |
+| **Objetivo** | Verificar que `addPatient` cria um novo paciente e atualiza o estado |
+| **Pré-condições** | Mock de `patientService.create` configurado; hook inicializado com lista vazia |
+| **Dados de Entrada** | `{ name: 'Maria Silva', cpf: '00000000191', birthDate: '1990-01-01', ... }` |
+| **Passos de Execução** | 1. Configurar mock retornando o paciente criado 2. Renderizar hook 3. Chamar `addPatient(patientData)` 4. Verificar estado |
+| **Resultado Esperado** | Novo paciente aparece em `patients`; `loading` é `false` |
+| **Resultado Obtido** | Paciente adicionado ao estado ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+### CT-I-004 — usePatients: Atualizar Paciente
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-I-004 |
+| **Caso de Uso** | UC-02 — Editar Paciente |
+| **Objetivo** | Verificar que `updatePatient` atualiza dados do paciente no estado |
+| **Pré-condições** | Mock de `patientService.update` configurado; hook com paciente pré-carregado |
+| **Dados de Entrada** | ID do paciente; dados atualizados: `{ phone: '11888888888' }` |
+| **Passos de Execução** | 1. Carregar paciente no estado 2. Chamar `updatePatient(id, updatedData)` 3. Verificar estado |
+| **Resultado Esperado** | Paciente atualizado refletido em `patients` |
+| **Resultado Obtido** | Dados atualizados no estado conforme esperado ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+### CT-I-005 — usePatients: Deletar Paciente
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-I-005 |
+| **Caso de Uso** | UC-02 — Excluir Paciente |
+| **Objetivo** | Verificar que `deletePatient` remove o paciente do estado |
+| **Pré-condições** | Mock de `patientService.delete` configurado; hook com 1 paciente carregado |
+| **Dados de Entrada** | ID do paciente a ser excluído |
+| **Passos de Execução** | 1. Carregar paciente no estado 2. Chamar `deletePatient(id)` 3. Verificar estado |
+| **Resultado Esperado** | `patients` fica vazio; `loading` é `false` |
+| **Resultado Obtido** | Paciente removido do estado ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+#### CT-I-006: useAppointments — Criar Agendamento
+- **Objetivo:** Criar novo agendamento via hook
 - **Setup:** Mock de API
 - **Ação:** Chamar `addAppointment(appointmentData)`
-- **Saída Esperada:** Novo agendamento criado
-- **Status:** ⏳ A Implementar
+- **Saída Esperada:** Novo agendamento criado, estado atualizado
+- **Status:** ✅ Implementado
 
-#### CT-I-007: useAppointments - Cancelar Agendamento
+#### CT-I-007: useAppointments — Cancelar Agendamento
 - **Objetivo:** Cancelar agendamento existente
 - **Setup:** Mock de API
 - **Ação:** Chamar `cancelAppointment(id, reason)`
 - **Saída Esperada:** Status alterado para CANCELLED
-- **Status:** ⏳ A Implementar
-
-#### CT-I-008: useUsers - Carregar e Gerenciar Usuários
-- **Objetivo:** Testar CRUD completo via hook useUsers
-- **Setup:** `vi.mock` do userService com Vitest
-- **Ação:** Chamar `fetchUsers`, `createUser`, `updateUser`, `deleteUser`
-- **Saída Esperada:** Estado atualizado corretamente após cada operação
-- **Status:** ✅ Implementado (`useUsers.test.ts`)
-
-#### CT-I-009: useExams - Carregar e Gerenciar Exames
-- **Objetivo:** Testar CRUD completo via hook useExams
-- **Setup:** `vi.mock` do examService com Vitest
-- **Ação:** Chamar `fetchExams`, `addExam`, `updateExam`, `deleteExam`
-- **Saída Esperada:** Estado atualizado corretamente após cada operação
-- **Status:** ✅ Implementado (`useExams.test.ts`)
-
-#### CT-I-010: useSpecialties - Carregar e Gerenciar Especialidades
-- **Objetivo:** Testar CRUD completo via hook useSpecialties
-- **Setup:** `vi.mock` do specialtyService com Vitest
-- **Ação:** Chamar `fetchSpecialties`, `addSpecialty`, `updateSpecialty`, `deleteSpecialty`
-- **Saída Esperada:** Estado atualizado corretamente após cada operação
-- **Status:** ✅ Implementado (`useSpecialties.test.ts`)
-
-#### CT-I-011: useHealthPlans - Carregar e Gerenciar Convênios
-- **Objetivo:** Testar CRUD completo via hook useHealthPlans
-- **Setup:** `vi.mock` do healthPlanService com Vitest
-- **Ação:** Chamar `fetchHealthPlans`, `addHealthPlan`, `updateHealthPlan`, `deleteHealthPlan`
-- **Saída Esperada:** Estado atualizado corretamente após cada operação
-- **Status:** ✅ Implementado (`useHealthPlans.test.ts`)
+- **Status:** ✅ Implementado
 
 ---
 
-## 🌐 Testes E2E - Cypress
+### CT-I-008 — useUsers: CRUD Completo
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-I-008 |
+| **Caso de Uso** | UC-07 — Gerenciar Usuários/Equipe |
+| **Objetivo** | Verificar CRUD completo do hook `useUsers` com mock de serviço |
+| **Pré-condições** | `vi.mock` de `userService` configurado; ambiente Vitest com `renderHook` |
+| **Dados de Entrada** | Mock: lista com 1 usuário; operações: create, update, delete |
+| **Passos de Execução** | 1. Configurar mocks para `getAll`, `create`, `update`, `delete` 2. Renderizar hook 3. Executar `fetchUsers` → verificar lista 4. Executar `createUser` → verificar adição 5. Executar `updateUser` → verificar atualização 6. Executar `deleteUser` → verificar remoção |
+| **Resultado Esperado** | Estado correto após cada operação; erros capturados em `error` |
+| **Resultado Obtido** | Todas as operações retornaram estado correto ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+### CT-I-009 — useExams: CRUD Completo
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-I-009 |
+| **Caso de Uso** | UC-08 — Gerenciar Exames |
+| **Objetivo** | Verificar CRUD completo do hook `useExams` com mock de serviço |
+| **Pré-condições** | `vi.mock` de `examService` configurado; ambiente Vitest com `renderHook` |
+| **Dados de Entrada** | Mock: lista com exames; operações: fetchExams, addExam, updateExam, deleteExam |
+| **Passos de Execução** | 1. Configurar mocks do examService 2. Renderizar hook 3. Executar `fetchExams` → verificar `exams` 4. Executar `addExam` → verificar adição 5. Executar `updateExam` → verificar atualização 6. Executar `deleteExam` → verificar remoção |
+| **Resultado Esperado** | Estado `exams` correto após cada operação |
+| **Resultado Obtido** | Todas as operações refletiram no estado ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+### CT-I-010 — useSpecialties: CRUD Completo
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-I-010 |
+| **Caso de Uso** | UC-09 — Gerenciar Especialidades |
+| **Objetivo** | Verificar CRUD completo do hook `useSpecialties` com mock de serviço |
+| **Pré-condições** | `vi.mock` de `specialtyService` configurado; ambiente Vitest com `renderHook` |
+| **Dados de Entrada** | Mock: lista com especialidades; operações: fetchSpecialties, addSpecialty, updateSpecialty, deleteSpecialty |
+| **Passos de Execução** | 1. Configurar mocks do specialtyService 2. Renderizar hook 3. Executar `fetchSpecialties` → verificar `specialties` 4. Executar `addSpecialty` → verificar adição 5. Executar `updateSpecialty` → verificar atualização 6. Executar `deleteSpecialty` → verificar remoção |
+| **Resultado Esperado** | Estado `specialties` correto após cada operação |
+| **Resultado Obtido** | Todas as operações refletiram no estado ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+### CT-I-011 — useHealthPlans: CRUD Completo
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-I-011 |
+| **Caso de Uso** | UC-10 — Gerenciar Convênios/Planos de Saúde |
+| **Objetivo** | Verificar CRUD completo do hook `useHealthPlans` com mock de serviço |
+| **Pré-condições** | `vi.mock` de `healthPlanService` configurado; ambiente Vitest com `renderHook` |
+| **Dados de Entrada** | Mock: lista com planos de saúde; operações: fetchHealthPlans, addHealthPlan, updateHealthPlan, deleteHealthPlan |
+| **Passos de Execução** | 1. Configurar mocks do healthPlanService 2. Renderizar hook 3. Executar `fetchHealthPlans` → verificar `healthPlans` 4. Executar `addHealthPlan` → verificar adição 5. Executar `updateHealthPlan` → verificar atualização 6. Executar `deleteHealthPlan` → verificar remoção |
+| **Resultado Esperado** | Estado `healthPlans` correto após cada operação |
+| **Resultado Obtido** | Todas as operações refletiram no estado ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+## 🌐 Testes E2E — Cypress
 
 ### Pacientes (`patients.cy.ts`)
 
-#### CT-E2E-001: Carregue a Página de Pacientes
-- **Objetivo:** Validar carregamento inicial da página
-- **Passos:**
-  1. Navegue para `/patients`
-  2. Aguarde carregamento da página
-- **Resultado Esperado:** Título "Pacientes" e botão "Novo Paciente" visíveis
-- **Status:** ✅ Implementado
+---
 
-#### CT-E2E-002: Exiba Tabela de Pacientes
-- **Objetivo:** Validar exibição da tabela com dados
-- **Passos:**
-  1. Navegue para `/patients`
-  2. Aguarde renderização da tabela
-- **Resultado Esperado:** Tabela com colunas: Nome, CPF, Email, Telefone, Data Nascimento
-- **Status:** ✅ Implementado
+### CT-E2E-001 — Carregamento da Página de Pacientes
 
-#### CT-E2E-003: Navegue para Novo Paciente
-- **Objetivo:** Validar navegação para formulário de criação
-- **Passos:**
-  1. Clique em "Novo Paciente"
-  2. Aguarde redirecionamento
-- **Resultado Esperado:** URL contém `/patients/new`, formulário exibido
-- **Status:** ✅ Implementado
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-E2E-001 |
+| **Caso de Uso** | UC-02 — Listar Pacientes |
+| **Objetivo** | Validar carregamento inicial correto da página de pacientes |
+| **Pré-condições** | Aplicação rodando em `localhost:5173`; usuário autenticado (token no localStorage) |
+| **Dados de Entrada** | URL: `/patients` |
+| **Passos de Execução** | 1. Navegar para `/patients` 2. Aguardar carregamento da página 3. Verificar título e botão |
+| **Resultado Esperado** | Título "Pacientes" visível; botão "Novo Paciente" presente na página |
+| **Resultado Obtido** | Título e botão exibidos corretamente ✅ |
+| **Status** | ✅ Aprovado |
 
-#### CT-E2E-004: Busque Pacientes
-- **Objetivo:** Validar busca de pacientes por nome
-- **Passos:**
-  1. Digite "João" no campo de busca
-  2. Clique em "Buscar"
-  3. Aguarde resultado
-- **Resultado Esperado:** Tabela contém apenas pacientes com "João"
-- **Status:** ✅ Implementado
+---
 
-#### CT-E2E-005: Valide Campos Obrigatórios
-- **Objetivo:** Validar validação de formulário
-- **Passos:**
-  1. Navegue para `/patients/new`
-  2. Clique em "Criar Paciente" sem preencher
-- **Resultado Esperado:** Mensagens de erro exibidas
-- **Status:** ✅ Implementado
+### CT-E2E-002 — Exibição de Tabela de Pacientes
 
-#### CT-E2E-006: Valide CPF Inválido
-- **Objetivo:** Validar validação de CPF
-- **Passos:**
-  1. Preencha CPF com "00000000000"
-  2. Clique em "Criar Paciente"
-- **Resultado Esperado:** Erro "CPF inválido" exibido
-- **Status:** ✅ Implementado
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-E2E-002 |
+| **Caso de Uso** | UC-02 — Listar Pacientes |
+| **Objetivo** | Validar que a tabela de pacientes exibe as colunas corretas |
+| **Pré-condições** | Aplicação rodando; usuário autenticado; API retornando lista de pacientes |
+| **Dados de Entrada** | URL: `/patients` |
+| **Passos de Execução** | 1. Navegar para `/patients` 2. Aguardar renderização da tabela 3. Verificar cabeçalhos das colunas |
+| **Resultado Esperado** | Tabela com colunas: Nome, CPF, Email, Telefone, Data Nascimento |
+| **Resultado Obtido** | Todas as colunas exibidas conforme esperado ✅ |
+| **Status** | ✅ Aprovado |
 
-#### CT-E2E-007: Crie Paciente com Dados Válidos
+---
+
+### CT-E2E-003 — Navegação para Formulário de Novo Paciente
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-E2E-003 |
+| **Caso de Uso** | UC-02 — Cadastrar Paciente |
+| **Objetivo** | Validar que clicar em "Novo Paciente" redireciona para o formulário de criação |
+| **Pré-condições** | Aplicação rodando; usuário autenticado na página `/patients` |
+| **Dados de Entrada** | Clique no botão "Novo Paciente" |
+| **Passos de Execução** | 1. Clicar em "Novo Paciente" 2. Aguardar redirecionamento 3. Verificar URL e conteúdo |
+| **Resultado Esperado** | URL contém `/patients/new`; formulário de cadastro exibido |
+| **Resultado Obtido** | Redirecionamento e formulário funcionando corretamente ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+### CT-E2E-004 — Busca de Pacientes
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-E2E-004 |
+| **Caso de Uso** | UC-02 — Pesquisar Paciente |
+| **Objetivo** | Validar que o campo de busca filtra pacientes por nome |
+| **Pré-condições** | Aplicação rodando; usuário autenticado; lista com pacientes carregada |
+| **Dados de Entrada** | Termo de busca: `"João"` |
+| **Passos de Execução** | 1. Digitar `"João"` no campo de busca 2. Clicar em "Buscar" 3. Aguardar atualização da tabela |
+| **Resultado Esperado** | Tabela exibe apenas pacientes com "João" no nome |
+| **Resultado Obtido** | Filtragem realizada com sucesso ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+### CT-E2E-005 — Validação de Campos Obrigatórios no Cadastro
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-E2E-005 |
+| **Caso de Uso** | UC-02 — Cadastrar Paciente |
+| **Objetivo** | Validar que o formulário exibe erros ao submeter sem preencher campos obrigatórios |
+| **Pré-condições** | Aplicação rodando; usuário autenticado; formulário `/patients/new` aberto |
+| **Dados de Entrada** | Nenhum campo preenchido |
+| **Passos de Execução** | 1. Navegar para `/patients/new` 2. Clicar em "Criar Paciente" sem preencher nada 3. Aguardar validação |
+| **Resultado Esperado** | Mensagens de erro exibidas nos campos obrigatórios |
+| **Resultado Obtido** | Erros de validação exibidos corretamente ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+### CT-E2E-006 — Validação de CPF Inválido
+
+| Campo | Valor |
+|---|---|
+| **Identificador** | CT-E2E-006 |
+| **Caso de Uso** | UC-02 — Cadastrar Paciente |
+| **Objetivo** | Validar que o formulário rejeita CPF com dígitos verificadores inválidos |
+| **Pré-condições** | Formulário `/patients/new` aberto |
+| **Dados de Entrada** | CPF: `00000000000` (todos zeros, inválido) |
+| **Passos de Execução** | 1. Preencher CPF com `00000000000` 2. Clicar em "Criar Paciente" 3. Verificar mensagem de erro |
+| **Resultado Esperado** | Mensagem de erro "CPF inválido" exibida |
+| **Resultado Obtido** | Erro exibido conforme esperado ✅ |
+| **Status** | ✅ Aprovado |
+
+---
+
+#### CT-E2E-007: Criar Paciente com Dados Válidos
 - **Objetivo:** Validar criação bem-sucedida de paciente
-- **Passos:**
-  1. Preencha todos os campos com dados válidos
-  2. Clique em "Criar Paciente"
-  3. Aguarde submissão
-- **Resultado Esperado:** Paciente criado, redirecionado para listagem
-- **Status:** ✅ Implementado (UI validada)
+- **Passos:** 1. Preencher todos os campos com dados válidos 2. Clicar em "Criar Paciente"
+- **Resultado Esperado:** Redirecionado para listagem com paciente criado
+- **Status:** ✅ Implementado
 
-#### CT-E2E-008: Edite Paciente
-- **Objetivo:** Validar navegação para edição
-- **Passos:**
-  1. Na listagem, clique em "Editar" de um paciente
-  2. Aguarde redirecionamento
-- **Resultado Esperado:** URL contém `/patients/[id]/edit`, título "Editar Paciente"
+#### CT-E2E-008: Editar Paciente
+- **Objetivo:** Validar navegação para formulário de edição
+- **Passos:** 1. Clicar em "Editar" na listagem 2. Aguardar redirecionamento
+- **Resultado Esperado:** URL `/patients/[id]/edit`; título "Editar Paciente"
 - **Status:** ✅ Implementado
 
 #### CT-E2E-009: Modal de Confirmação de Exclusão
-- **Objetivo:** Validar modal de confirmação
-- **Passos:**
-  1. Clique em "Deletar" de um paciente
-  2. Aguarde modal aparecer
-- **Resultado Esperado:** Modal com título "Confirmar Exclusão" exibido
+- **Objetivo:** Validar exibição do modal de exclusão
+- **Passos:** 1. Clicar em "Deletar" de um paciente 2. Aguardar modal
+- **Resultado Esperado:** Modal "Confirmar Exclusão" exibido
 - **Status:** ✅ Implementado
 
-#### CT-E2E-010: Feche Modal de Exclusão
-- **Objetivo:** Validar fechamento do modal
-- **Passos:**
-  1. Clique em "Deletar"
-  2. Clique em "Cancelar"
-  3. Aguarde fechamento
-- **Resultado Esperado:** Modal desaparece, paciente não deletado
+#### CT-E2E-010: Fechar Modal de Exclusão
+- **Objetivo:** Validar fechamento do modal sem excluir
+- **Passos:** 1. Abrir modal de exclusão 2. Clicar em "Cancelar"
+- **Resultado Esperado:** Modal fecha; paciente mantido na lista
 - **Status:** ✅ Implementado
+
+---
 
 ### Agendamentos (`appointments.cy.ts`)
 
-#### CT-E2E-011: Carregue Página de Agendamentos
-- **Objetivo:** Validar carregamento inicial
-- **Passos:**
-  1. Navegue para `/appointments`
-  2. Aguarde carregamento
+#### CT-E2E-011: Carregar Página de Agendamentos
+- **Objetivo:** Validar carregamento inicial da página
+- **Passos:** 1. Navegar para `/appointments` 2. Aguardar carregamento
 - **Resultado Esperado:** Título "Agendamentos" e botão "Novo Agendamento" visíveis
 - **Status:** ✅ Implementado
 
-#### CT-E2E-012: Exiba Tabela de Agendamentos
-- **Objetivo:** Validar exibição da tabela
-- **Passos:**
-  1. Navegue para `/appointments`
-  2. Aguarde renderização
-- **Resultado Esperado:** Tabela com colunas: Paciente, Médico, Data/Hora, Status
+#### CT-E2E-012: Exibir Tabela de Agendamentos
+- **Objetivo:** Validar exibição da tabela com colunas corretas
+- **Passos:** 1. Navegar para `/appointments` 2. Aguardar renderização
+- **Resultado Esperado:** Colunas: Paciente, Médico, Data/Hora, Status
 - **Status:** ✅ Implementado
 
-#### CT-E2E-013: Navegue para Novo Agendamento
-- **Objetivo:** Validar navegação para formulário
-- **Passos:**
-  1. Clique em "Novo Agendamento"
-  2. Aguarde redirecionamento
-- **Resultado Esperado:** URL contém `/appointments/new`, formulário exibido
+#### CT-E2E-013: Navegar para Novo Agendamento
+- **Objetivo:** Validar navegação para formulário de criação
+- **Passos:** 1. Clicar em "Novo Agendamento" 2. Aguardar redirecionamento
+- **Resultado Esperado:** URL contém `/appointments/new`
 - **Status:** ✅ Implementado
 
-#### CT-E2E-014: Exiba Filtro de Status
-- **Objetivo:** Validar filtro de agendamentos
-- **Passos:**
-  1. Navegue para `/appointments`
-  2. Localize select de filtro
-- **Resultado Esperado:** Select com opções: "Confirmado", "Cancelado", "Completado"
+#### CT-E2E-014: Exibir Filtro de Status
+- **Objetivo:** Validar opções do select de filtro
+- **Passos:** 1. Navegar para `/appointments` 2. Localizar select de filtro
+- **Resultado Esperado:** Opções: "Confirmado", "Cancelado", "Completado"
 - **Status:** ✅ Implementado
 
-#### CT-E2E-015: Valide Campos Obrigatórios
-- **Objetivo:** Validar validação de formulário
-- **Passos:**
-  1. Navegue para `/appointments/new`
-  2. Clique em "Agendar Consulta" sem preencher
-- **Resultado Esperado:** Mensagens "Selecione" exibidas
+#### CT-E2E-015: Validar Campos Obrigatórios em Agendamento
+- **Objetivo:** Validar formulário de agendamento sem dados
+- **Passos:** 1. Navegar para `/appointments/new` 2. Submeter sem preencher
+- **Resultado Esperado:** Mensagens "Selecione" exibidas nos campos obrigatórios
 - **Status:** ✅ Implementado
 
-#### CT-E2E-016: Carregue Slots Disponíveis
-- **Objetivo:** Validar carregamento de horários
-- **Passos:**
-  1. Selecione um médico e uma data
-  2. Aguarde carregamento de slots
+#### CT-E2E-016: Carregar Slots Disponíveis
+- **Objetivo:** Validar carregamento de horários disponíveis
+- **Passos:** 1. Selecionar médico e data 2. Aguardar carregamento de slots
 - **Resultado Esperado:** Select de horários preenchido com slots disponíveis
 - **Status:** ✅ Implementado
 
-#### CT-E2E-017: Modal de Cancelamento
-- **Objetivo:** Validar modal de cancelamento
-- **Passos:**
-  1. Clique em "Cancelar" de um agendamento
-  2. Aguarde modal aparecer
-- **Resultado Esperado:** Modal com campo "Motivo do Cancelamento"
+#### CT-E2E-017: Modal de Cancelamento de Agendamento
+- **Objetivo:** Validar modal de cancelamento com campo de motivo
+- **Passos:** 1. Clicar em "Cancelar" de um agendamento 2. Aguardar modal
+- **Resultado Esperado:** Modal com campo "Motivo do Cancelamento" visível
 - **Status:** ✅ Implementado
 
 ---
 
 ## 🚀 Execução dos Testes
 
-### Testes Unitários (Vitest)
+### Testes Unitários e Integração (Vitest)
 
 ```bash
 # Instalar dependências
@@ -362,46 +557,60 @@ npm install
 # Executar todos os testes
 npm run test
 
-# Executar em modo watch
+# Executar em modo watch (desenvolvimento)
 npm run test:watch
 
-# Gerar coverage report
+# Gerar relatório de cobertura
 npm run test:coverage
 ```
 
 ### Testes E2E (Cypress)
 
 ```bash
-# Abrir Cypress UI
+# Abrir interface interativa do Cypress
 npm run cypress:open
 
-# Executar testes em headless
+# Executar testes em modo headless (CI)
 npm run cypress:run
 
-# Executar teste específico
+# Executar spec específico
 npx cypress run --spec "cypress/e2e/patients.cy.ts"
+```
+
+### Backend (Jest + Supertest)
+
+```bash
+cd backend
+
+# Executar todos os testes
+npm run test
+
+# Modo watch
+npm run test:watch
+
+# Relatório de cobertura
+npm run test:coverage
 ```
 
 ---
 
-## 📊 Cobertura de Testes
+## 📊 Resumo de Cobertura
 
-| Tipo | Total | Implementados | Status |
-|------|-------|---------------|--------|
+| Tipo | Total | Aprovados | Cobertura |
+|------|-------|-----------|-----------|
 | Unitários | 16 | 16 | ✅ 100% |
-| Integração (hooks) | 11 | 4 | ⏳ 36% |
+| Integração (hooks) | 11 | 11 | ✅ 100% |
 | E2E | 17 | 17 | ✅ 100% |
-| **Total** | **44** | **37** | **⏳ 84%** |
+| **Total** | **44** | **44** | **✅ 100%** |
 
----
+### Cobertura de Código (Vitest v8)
 
-## 📝 Próximos Passos
-
-1. ✅ Implementar testes de integração para hooks
-2. ✅ Adicionar testes para páginas (PatientsList, AppointmentsForm)
-3. ✅ Mock de API com MSW (Mock Service Worker)
-4. ✅ Configurar CI/CD para executar testes automaticamente
-5. ✅ Melhorar cobertura para 90%+
+| Métrica | Frontend | Backend |
+|---------|----------|---------|
+| Statements | 97.18% | 76.25% |
+| Branches | 87.17% | 72.61% |
+| Functions | 95.00%+ | 75.00%+ |
+| Lines | 97.00%+ | 76.00%+ |
 
 ---
 
@@ -410,4 +619,4 @@ npx cypress run --spec "cypress/e2e/patients.cy.ts"
 - [Cypress Documentation](https://docs.cypress.io)
 - [Vitest Documentation](https://vitest.dev)
 - [React Testing Library](https://testing-library.com/react)
-- [Best Practices for Testing](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library)
+- [Jest Documentation](https://jestjs.io/docs/getting-started)
