@@ -12,15 +12,24 @@ export const Navbar: React.FC = () => {
           <h1 className="text-2xl font-bold">VitaLink</h1>
         </Link>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 text-sm">
+          <Link to="/dashboard" className="hover:text-blue-200 transition">
+            Dashboard
+          </Link>
           <Link to="/patients" className="hover:text-blue-200 transition">
             Pacientes
           </Link>
           <Link to="/appointments" className="hover:text-blue-200 transition">
             Agendamentos
           </Link>
-          <Link to="/dashboard" className="hover:text-blue-200 transition">
-            Dashboard
+          <Link to="/exams" className="hover:text-blue-200 transition">
+            Exames
+          </Link>
+          <Link to="/specialties" className="hover:text-blue-200 transition">
+            Especialidades
+          </Link>
+          <Link to="/health-plans" className="hover:text-blue-200 transition">
+            Convênios
           </Link>
 
           <div className="border-l border-blue-400 pl-6 flex items-center gap-3">

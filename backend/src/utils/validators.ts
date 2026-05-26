@@ -194,3 +194,73 @@ export const validateCreatePrescriptionInput = (data: any) => {
     throw new ValidationError(JSON.stringify(errors));
   }
 };
+
+export const validateCreateExamInput = (data: any) => {
+  const errors: Record<string, string> = {};
+
+  if (!data.name || data.name.trim().length === 0) {
+    errors.name = 'Nome do exame é obrigatório';
+  }
+
+  if (!data.patientId || data.patientId.trim().length === 0) {
+    errors.patientId = 'Paciente é obrigatório';
+  }
+
+  if (!data.doctorId || data.doctorId.trim().length === 0) {
+    errors.doctorId = 'Médico é obrigatório';
+  }
+
+  const validTypes = ['LAB', 'IMAGE', 'FUNCTIONAL', 'OTHER'];
+  if (data.type && !validTypes.includes(data.type)) {
+    errors.type = 'Tipo de exame inválido';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    throw new ValidationError(JSON.stringify(errors));
+  }
+};
+
+export const validateCreateSpecialtyInput = (data: any) => {
+  const errors: Record<string, string> = {};
+
+  if (!data.name || data.name.trim().length === 0) {
+    errors.name = 'Nome da especialidade é obrigatório';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    throw new ValidationError(JSON.stringify(errors));
+  }
+};
+
+export const validateCreateHealthPlanInput = (data: any) => {
+  const errors: Record<string, string> = {};
+
+  if (!data.planName || data.planName.trim().length === 0) {
+    errors.planName = 'Nome do plano é obrigatório';
+  }
+
+  if (!data.provider || data.provider.trim().length === 0) {
+    errors.provider = 'Operadora é obrigatória';
+  }
+
+  if (!data.planNumber || data.planNumber.trim().length === 0) {
+    errors.planNumber = 'Número do plano é obrigatório';
+  }
+
+  if (!data.validUntil || !validateDateFormat(data.validUntil)) {
+    errors.validUntil = 'Data de validade inválida';
+  }
+
+  if (!data.patientId || data.patientId.trim().length === 0) {
+    errors.patientId = 'Paciente é obrigatório';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    throw new ValidationError(JSON.stringify(errors));
+  }
+};
+
+export const validateCEP = (cep: string): boolean => {
+  const cleaned = cep.replace(/\D/g, '');
+  return cleaned.length === 8;
+};

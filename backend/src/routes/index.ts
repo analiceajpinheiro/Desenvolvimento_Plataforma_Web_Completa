@@ -4,6 +4,10 @@ import {
   userController,
   patientController,
   appointmentController,
+  examController,
+  specialtyController,
+  healthPlanController,
+  viaCepController,
 } from '../controllers';
 import { medicalRecordController } from '../controllers';
 import { prescriptionController } from '../controllers';
@@ -58,5 +62,33 @@ router.post('/medical-records/:id/prescriptions', authMiddleware, roleMiddleware
 router.get('/prescriptions/:id', authMiddleware, prescriptionController.getById);
 router.put('/prescriptions/:id', authMiddleware, roleMiddleware(['DOCTOR', 'ADMIN']), prescriptionController.update);
 router.delete('/prescriptions/:id', authMiddleware, roleMiddleware(['DOCTOR', 'ADMIN']), prescriptionController.delete);
+
+// ===== EXAM ROUTES (Sprint 3) =====
+router.get('/exams', authMiddleware, examController.getAll);
+router.post('/exams', authMiddleware, roleMiddleware(['DOCTOR', 'ADMIN']), examController.create);
+router.get('/exams/:id', authMiddleware, examController.getById);
+router.put('/exams/:id', authMiddleware, roleMiddleware(['DOCTOR', 'ADMIN']), examController.update);
+router.delete('/exams/:id', authMiddleware, roleMiddleware(['DOCTOR', 'ADMIN']), examController.delete);
+
+// ===== SPECIALTY ROUTES (Sprint 3) =====
+router.get('/specialties', authMiddleware, specialtyController.getAll);
+router.post('/specialties', authMiddleware, roleMiddleware(['ADMIN']), specialtyController.create);
+router.get('/specialties/:id', authMiddleware, specialtyController.getById);
+router.put('/specialties/:id', authMiddleware, roleMiddleware(['ADMIN']), specialtyController.update);
+router.delete('/specialties/:id', authMiddleware, roleMiddleware(['ADMIN']), specialtyController.delete);
+
+// ===== HEALTH PLAN ROUTES (Sprint 3) =====
+router.get('/health-plans', authMiddleware, healthPlanController.getAll);
+router.post('/health-plans', authMiddleware, roleMiddleware(['DOCTOR', 'RECEPTIONIST', 'ADMIN']), healthPlanController.create);
+router.get('/health-plans/:id', authMiddleware, healthPlanController.getById);
+router.put('/health-plans/:id', authMiddleware, roleMiddleware(['DOCTOR', 'RECEPTIONIST', 'ADMIN']), healthPlanController.update);
+router.delete('/health-plans/:id', authMiddleware, roleMiddleware(['ADMIN']), healthPlanController.delete);
+router.get('/patients/:patientId/health-plans', authMiddleware, (req, res, next) => {
+  req.query.patientId = req.params.patientId;
+  return healthPlanController.getAll(req, res, next);
+});
+
+// ===== VIA CEP ROUTE (Sprint 3) =====
+router.get('/address/cep/:cep', authMiddleware, viaCepController.lookup);
 
 export default router;

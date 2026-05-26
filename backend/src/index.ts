@@ -31,6 +31,7 @@ app.use((req: Request, res: Response) => {
   res.status(404).json({
     success: false,
     message: 'Rota não encontrada',
+    code: 'NOT_FOUND',
     path: req.path,
   });
 });

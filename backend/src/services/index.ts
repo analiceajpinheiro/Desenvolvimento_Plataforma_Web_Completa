@@ -1,15 +1,18 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { userRepository, patientRepository, appointmentRepository } from '../repositories';
+import { examRepository, specialtyRepository, healthPlanRepository } from '../repositories';
 import {
   validateCreateUserInput,
   validateCreatePatientInput,
   validateCreateAppointmentInput,
+  validateCreateExamInput,
+  validateCreateSpecialtyInput,
+  validateCreateHealthPlanInput,
 } from '../utils/validators';
 import {
   UnauthorizedError,
   ValidationError,
-  InternalServerError,
   NotFoundError,
 } from '../utils/errors';
 import axios from 'axios';
@@ -118,9 +121,12 @@ export const patientService = {
     validateCreatePatientInput(data);
     
     // Integração com API de geolocalização (Nominatim)
-    let coordinates = { latitude: null, longitude: null };
+    let coordinates: { latitude: number | null; longitude: number | null } = { latitude: null, longitude: null };
     try {
-      coordinates = await this.getCoordinates(data.address);
+      const coords = await this.getCoordinates(data.address);
+      if (coords && coords.latitude !== null && coords.longitude !== null) {
+        coordinates = coords;
+      }
     } catch (err) {
       console.warn('Falha ao obter coordenadas:', err);
     }
@@ -399,5 +405,124 @@ export const prescriptionService = {
 
   async delete(id: string) {
     return await prescriptionRepository.delete(id);
+  },
+};
+
+// ===== EXAM SERVICE =====
+export const examService = {
+  async getAll(limit = 10, skip = 0, filters: { patientId?: string; doctorId?: string; status?: string } = {}) {
+    return await examRepository.findAll(limit, skip, filters as any);
+  },
+
+  async getById(id: string) {
+    return await examRepository.findById(id);
+  },
+
+  async create(data: any) {
+    validateCreateExamInput(data);
+    await patientRepository.findById(data.patientId);
+    await userRepository.findById(data.doctorId);
+    return await examRepository.create({
+      ...data,
+      scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : undefined,
+    });
+  },
+
+  async update(id: string, data: any) {
+    if (data.scheduledAt) data.scheduledAt = new Date(data.scheduledAt);
+    if (data.completedAt) data.completedAt = new Date(data.completedAt);
+    return await examRepository.update(id, data);
+  },
+
+  async delete(id: string) {
+    return await examRepository.delete(id);
+  },
+};
+
+// ===== SPECIALTY SERVICE =====
+export const specialtyService = {
+  async getAll(limit = 10, skip = 0) {
+    return await specialtyRepository.findAll(limit, skip);
+  },
+
+  async getById(id: string) {
+    return await specialtyRepository.findById(id);
+  },
+
+  async create(data: any) {
+    validateCreateSpecialtyInput(data);
+    return await specialtyRepository.create(data);
+  },
+
+  async update(id: string, data: any) {
+    return await specialtyRepository.update(id, data);
+  },
+
+  async delete(id: string) {
+    return await specialtyRepository.delete(id);
+  },
+};
+
+// ===== HEALTH PLAN SERVICE =====
+export const healthPlanService = {
+  async getAll(limit = 10, skip = 0, patientId?: string) {
+    return await healthPlanRepository.findAll(limit, skip, patientId);
+  },
+
+  async getById(id: string) {
+    return await healthPlanRepository.findById(id);
+  },
+
+  async create(data: any) {
+    validateCreateHealthPlanInput(data);
+    await patientRepository.findById(data.patientId);
+    return await healthPlanRepository.create({
+      ...data,
+      validUntil: new Date(data.validUntil),
+    });
+  },
+
+  async update(id: string, data: any) {
+    if (data.validUntil) data.validUntil = new Date(data.validUntil);
+    return await healthPlanRepository.update(id, data);
+  },
+
+  async delete(id: string) {
+    return await healthPlanRepository.delete(id);
+  },
+};
+
+// ===== VIA CEP SERVICE =====
+export const viaCepService = {
+  async lookupCEP(cep: string) {
+    const cleaned = cep.replace(/\D/g, '');
+    if (cleaned.length !== 8) {
+      throw new ValidationError('CEP deve conter 8 dígitos');
+    }
+
+    try {
+      const response = await axios.get(
+        `https://viacep.com.br/ws/${cleaned}/json/`,
+        { timeout: 5000 }
+      );
+
+      if (response.data.erro) {
+        throw new NotFoundError('CEP');
+      }
+
+      const { cep: resCep, logradouro, complemento, bairro, localidade, uf } = response.data;
+      return {
+        cep: resCep,
+        logradouro,
+        complemento,
+        bairro,
+        localidade,
+        uf,
+        address: `${logradouro}${complemento ? ', ' + complemento : ''}, ${bairro}, ${localidade} - ${uf}`,
+      };
+    } catch (err: any) {
+      if (err.statusCode === 404 || err.code === 'NOT_FOUND') throw err;
+      throw new ValidationError('Erro ao consultar CEP. Verifique o número informado.');
+    }
   },
 };

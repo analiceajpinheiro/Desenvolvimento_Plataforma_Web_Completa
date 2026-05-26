@@ -13,6 +13,12 @@ import {
   MedicalRecordsForm,
   UsersList,
   UsersForm,
+  ExamsList,
+  ExamsForm,
+  SpecialtiesList,
+  SpecialtiesForm,
+  HealthPlansList,
+  HealthPlansForm,
 } from './pages';
 
 function App() {
@@ -122,6 +128,48 @@ function App() {
                 <UsersForm />
               </ProtectedRoute>
             }
+          />
+
+          {/* Sprint 3: Exames */}
+          <Route
+            path="/exams"
+            element={<ProtectedRoute><ExamsList /></ProtectedRoute>}
+          />
+          <Route
+            path="/exams/new"
+            element={<ProtectedRoute><ExamsForm /></ProtectedRoute>}
+          />
+          <Route
+            path="/exams/:id/edit"
+            element={<ProtectedRoute><ExamsForm /></ProtectedRoute>}
+          />
+
+          {/* Sprint 3: Especialidades */}
+          <Route
+            path="/specialties"
+            element={<ProtectedRoute><SpecialtiesList /></ProtectedRoute>}
+          />
+          <Route
+            path="/specialties/new"
+            element={<ProtectedRoute><SpecialtiesForm /></ProtectedRoute>}
+          />
+          <Route
+            path="/specialties/:id/edit"
+            element={<ProtectedRoute><SpecialtiesForm /></ProtectedRoute>}
+          />
+
+          {/* Sprint 3: Convênios */}
+          <Route
+            path="/health-plans"
+            element={<ProtectedRoute><HealthPlansList /></ProtectedRoute>}
+          />
+          <Route
+            path="/health-plans/new"
+            element={<ProtectedRoute><HealthPlansForm /></ProtectedRoute>}
+          />
+          <Route
+            path="/health-plans/:id/edit"
+            element={<ProtectedRoute><HealthPlansForm /></ProtectedRoute>}
           />
 
           {/* 404 */}

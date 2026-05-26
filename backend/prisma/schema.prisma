@@ -24,9 +24,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  appointments Appointment[]
+  appointments   Appointment[]
   medicalRecords MedicalRecord[]
-  prescriptions Prescription[]
+  prescriptions  Prescription[]
+  exams          Exam[]
 
   @@map("users")
 }
@@ -46,29 +47,32 @@ model Patient {
   phone     String
   email     String   @unique
   address   String
+  cep       String?
   latitude  Float?
   longitude Float?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  appointments Appointment[]
+  appointments   Appointment[]
   medicalRecords MedicalRecord[]
+  exams          Exam[]
+  healthPlans    HealthPlan[]
 
   @@map("patients")
 }
 
 model Appointment {
-  id        String   @id @default(cuid())
+  id        String            @id @default(cuid())
   date      DateTime
   status    AppointmentStatus @default(CONFIRMED)
   notes     String?
 
-  doctorId  String
-  doctor    User     @relation(fields: [doctorId], references: [id])
+  doctorId String
+  doctor   User   @relation(fields: [doctorId], references: [id])
 
   patientId String
-  patient   Patient  @relation(fields: [patientId], references: [id])
+  patient   Patient @relation(fields: [patientId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -86,20 +90,20 @@ enum AppointmentStatus {
 }
 
 model MedicalRecord {
-  id        String   @id @default(cuid())
+  id            String  @id @default(cuid())
   mainComplaint String
-  history   String?
-  physicalExam String?
-  diagnosis String?
-  treatment String?
+  history       String?
+  physicalExam  String?
+  diagnosis     String?
+  treatment     String?
 
-  doctorId  String
-  doctor    User     @relation(fields: [doctorId], references: [id])
+  doctorId String
+  doctor   User   @relation(fields: [doctorId], references: [id])
 
   patientId String
-  patient   Patient  @relation(fields: [patientId], references: [id])
+  patient   Patient @relation(fields: [patientId], references: [id])
 
-  appointmentId String @unique
+  appointmentId String      @unique
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
 
   createdAt DateTime @default(now())
@@ -111,15 +115,15 @@ model MedicalRecord {
 }
 
 model Prescription {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   medication String
   dosage    String
   frequency String
   duration  String
   notes     String?
 
-  doctorId  String
-  doctor    User     @relation(fields: [doctorId], references: [id])
+  doctorId String
+  doctor   User   @relation(fields: [doctorId], references: [id])
 
   medicalRecordId String
   medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
@@ -127,4 +131,73 @@ model Prescription {
   createdAt DateTime @default(now())
 
   @@map("prescriptions")
+}
+
+// ===== SPRINT 3: NOVOS MODELOS =====
+
+model Exam {
+  id          String     @id @default(cuid())
+  name        String
+  type        ExamType   @default(LAB)
+  description String?
+  result      String?
+  status      ExamStatus @default(REQUESTED)
+  scheduledAt DateTime?
+  completedAt DateTime?
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  doctorId String
+  doctor   User   @relation(fields: [doctorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("exams")
+}
+
+enum ExamType {
+  LAB
+  IMAGE
+  FUNCTIONAL
+  OTHER
+}
+
+enum ExamStatus {
+  REQUESTED
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Specialty {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  description String?
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("specialties")
+}
+
+model HealthPlan {
+  id         String   @id @default(cuid())
+  planName   String
+  provider   String
+  planNumber String   @unique
+  validUntil DateTime
+  notes      String?
+  isActive   Boolean  @default(true)
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("health_plans")
 }

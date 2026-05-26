@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role, ExamType, ExamStatus } from '@prisma/client';
 import { NotFoundError, ConflictError } from '../utils/errors';
 
 const prisma = new PrismaClient();
@@ -19,7 +19,7 @@ export const userRepository = {
   },
 
   async findAll(limit = 10, skip = 0, role?: string) {
-    const where = role ? { role } : {};
+    const where = role ? { role: role as Role } : {};
     const [data, total] = await Promise.all([
       prisma.user.findMany({
         where,
@@ -459,5 +459,207 @@ export const prescriptionRepository = {
     return await prisma.prescription.delete({
       where: { id },
     });
+  },
+};
+
+// ===== EXAM REPOSITORY =====
+export const examRepository = {
+  async findById(id: string) {
+    const exam = await prisma.exam.findUnique({
+      where: { id },
+      include: {
+        patient: true,
+        doctor: {
+          select: { id: true, name: true, email: true, role: true, specialty: true, isActive: true, createdAt: true },
+        },
+      },
+    });
+    if (!exam) throw new NotFoundError('Exame');
+    return exam;
+  },
+
+  async findAll(limit = 10, skip = 0, filters?: { patientId?: string; doctorId?: string; status?: ExamStatus }) {
+    const where: any = {};
+    if (filters?.patientId) where.patientId = filters.patientId;
+    if (filters?.doctorId) where.doctorId = filters.doctorId;
+    if (filters?.status) where.status = filters.status;
+
+    const [data, total] = await Promise.all([
+      prisma.exam.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          patient: { select: { id: true, name: true, cpf: true } },
+          doctor: { select: { id: true, name: true, specialty: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.exam.count({ where }),
+    ]);
+    return { data, total };
+  },
+
+  async create(data: {
+    name: string;
+    type?: ExamType;
+    description?: string;
+    patientId: string;
+    doctorId: string;
+    scheduledAt?: Date;
+  }) {
+    return await prisma.exam.create({
+      data,
+      include: {
+        patient: { select: { id: true, name: true, cpf: true } },
+        doctor: { select: { id: true, name: true, specialty: true } },
+      },
+    });
+  },
+
+  async update(id: string, data: {
+    name?: string;
+    type?: ExamType;
+    description?: string;
+    result?: string;
+    status?: ExamStatus;
+    scheduledAt?: Date;
+    completedAt?: Date;
+  }) {
+    await this.findById(id);
+    return await prisma.exam.update({
+      where: { id },
+      data,
+      include: {
+        patient: { select: { id: true, name: true, cpf: true } },
+        doctor: { select: { id: true, name: true, specialty: true } },
+      },
+    });
+  },
+
+  async delete(id: string) {
+    await this.findById(id);
+    return await prisma.exam.delete({ where: { id } });
+  },
+};
+
+// ===== SPECIALTY REPOSITORY =====
+export const specialtyRepository = {
+  async findById(id: string) {
+    const specialty = await prisma.specialty.findUnique({ where: { id } });
+    if (!specialty) throw new NotFoundError('Especialidade');
+    return specialty;
+  },
+
+  async findByName(name: string) {
+    return await prisma.specialty.findUnique({ where: { name } });
+  },
+
+  async findAll(limit = 10, skip = 0) {
+    const [data, total] = await Promise.all([
+      prisma.specialty.findMany({
+        skip,
+        take: limit,
+        orderBy: { name: 'asc' },
+      }),
+      prisma.specialty.count(),
+    ]);
+    return { data, total };
+  },
+
+  async create(data: { name: string; description?: string }) {
+    const existing = await this.findByName(data.name);
+    if (existing) throw new ConflictError('Especialidade já cadastrada');
+    return await prisma.specialty.create({ data });
+  },
+
+  async update(id: string, data: { name?: string; description?: string; isActive?: boolean }) {
+    await this.findById(id);
+    if (data.name) {
+      const existing = await prisma.specialty.findFirst({
+        where: { name: data.name, id: { not: id } },
+      });
+      if (existing) throw new ConflictError('Especialidade já cadastrada');
+    }
+    return await prisma.specialty.update({ where: { id }, data });
+  },
+
+  async delete(id: string) {
+    await this.findById(id);
+    return await prisma.specialty.update({ where: { id }, data: { isActive: false } });
+  },
+};
+
+// ===== HEALTH PLAN REPOSITORY =====
+export const healthPlanRepository = {
+  async findById(id: string) {
+    const plan = await prisma.healthPlan.findUnique({
+      where: { id },
+      include: { patient: { select: { id: true, name: true, cpf: true } } },
+    });
+    if (!plan) throw new NotFoundError('Convênio');
+    return plan;
+  },
+
+  async findByPlanNumber(planNumber: string) {
+    return await prisma.healthPlan.findUnique({ where: { planNumber } });
+  },
+
+  async findAll(limit = 10, skip = 0, patientId?: string) {
+    const where: any = patientId ? { patientId } : {};
+    const [data, total] = await Promise.all([
+      prisma.healthPlan.findMany({
+        where,
+        skip,
+        take: limit,
+        include: { patient: { select: { id: true, name: true, cpf: true } } },
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.healthPlan.count({ where }),
+    ]);
+    return { data, total };
+  },
+
+  async create(data: {
+    planName: string;
+    provider: string;
+    planNumber: string;
+    validUntil: Date;
+    notes?: string;
+    patientId: string;
+  }) {
+    const existing = await this.findByPlanNumber(data.planNumber);
+    if (existing) throw new ConflictError('Número do plano já cadastrado');
+    return await prisma.healthPlan.create({
+      data,
+      include: { patient: { select: { id: true, name: true, cpf: true } } },
+    });
+  },
+
+  async update(id: string, data: {
+    planName?: string;
+    provider?: string;
+    planNumber?: string;
+    validUntil?: Date;
+    notes?: string;
+    isActive?: boolean;
+  }) {
+    await this.findById(id);
+    if (data.planNumber) {
+      const existing = await prisma.healthPlan.findFirst({
+        where: { planNumber: data.planNumber, id: { not: id } },
+      });
+      if (existing) throw new ConflictError('Número do plano já cadastrado');
+    }
+    return await prisma.healthPlan.update({
+      where: { id },
+      data,
+      include: { patient: { select: { id: true, name: true, cpf: true } } },
+    });
+  },
+
+  async delete(id: string) {
+    await this.findById(id);
+    return await prisma.healthPlan.delete({ where: { id } });
   },
 };

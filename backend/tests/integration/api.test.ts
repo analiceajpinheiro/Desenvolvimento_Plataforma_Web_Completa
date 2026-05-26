@@ -40,6 +40,30 @@ jest.mock('../../src/services', () => ({
     cancelAppointment: jest.fn(),
     getAvailableSlots: jest.fn(),
   },
+  examService: {
+    getAll: jest.fn(),
+    getById: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  },
+  specialtyService: {
+    getAll: jest.fn(),
+    getById: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  },
+  healthPlanService: {
+    getAll: jest.fn(),
+    getById: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  },
+  viaCepService: {
+    lookupCEP: jest.fn(),
+  },
 }));
 
 describe('API Integration Tests', () => {
@@ -50,6 +74,15 @@ describe('API Integration Tests', () => {
     app.use(express.json());
     app.use(jsonErrorHandler);
     app.use('/api', routes);
+    // 404 handler
+    app.use((req, res) => {
+      res.status(404).json({
+        success: false,
+        message: 'Rota não encontrada',
+        code: 'NOT_FOUND',
+        path: req.path,
+      });
+    });
     app.use(errorHandler);
     jest.clearAllMocks();
   });
@@ -342,6 +375,236 @@ describe('API Integration Tests', () => {
 
       expect(response.status).toBe(400);
       expect(response.body.code).toBe('INVALID_JSON');
+    });
+  });
+
+  // ===== SPRINT 3: NOVOS TESTES =====
+
+  describe('Exam Routes', () => {
+    it('GET /api/exams deve retornar lista de exames', async () => {
+      const { authService, examService } = require('../../src/services');
+
+      authService.verifyToken.mockReturnValue('user-1');
+      examService.getAll.mockResolvedValue({
+        data: [
+          {
+            id: 'exam-1',
+            name: 'Hemograma',
+            type: 'LAB',
+            status: 'REQUESTED',
+            patientId: 'patient-1',
+            doctorId: 'doctor-1',
+          },
+        ],
+        total: 1,
+      });
+
+      const response = await request(app)
+        .get('/api/exams')
+        .set('Authorization', 'Bearer valid-token');
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(examService.getAll).toHaveBeenCalled();
+    });
+
+    it('POST /api/exams deve criar novo exame', async () => {
+      const { authService, examService, userService } = require('../../src/services');
+
+      authService.verifyToken.mockReturnValue('doctor-1');
+      userService.getUserById.mockResolvedValue({ id: 'doctor-1', role: 'DOCTOR' });
+      examService.create.mockResolvedValue({
+        id: 'exam-1',
+        name: 'Hemograma',
+        type: 'LAB',
+        status: 'REQUESTED',
+        patientId: 'patient-1',
+        doctorId: 'doctor-1',
+      });
+
+      const response = await request(app)
+        .post('/api/exams')
+        .set('Authorization', 'Bearer valid-token')
+        .send({
+          name: 'Hemograma',
+          type: 'LAB',
+          patientId: 'patient-1',
+          doctorId: 'doctor-1',
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body.success).toBe(true);
+      expect(examService.create).toHaveBeenCalled();
+    });
+
+    it('PUT /api/exams/:id deve atualizar exame', async () => {
+      const { authService, examService, userService } = require('../../src/services');
+
+      authService.verifyToken.mockReturnValue('doctor-1');
+      userService.getUserById.mockResolvedValue({ id: 'doctor-1', role: 'DOCTOR' });
+      examService.update.mockResolvedValue({
+        id: 'exam-1',
+        name: 'Hemograma Completo',
+        status: 'COMPLETED',
+      });
+
+      const response = await request(app)
+        .put('/api/exams/exam-1')
+        .set('Authorization', 'Bearer valid-token')
+        .send({ status: 'COMPLETED', result: 'Normal' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+    });
+
+    it('DELETE /api/exams/:id deve remover exame', async () => {
+      const { authService, examService, userService } = require('../../src/services');
+
+      authService.verifyToken.mockReturnValue('doctor-1');
+      userService.getUserById.mockResolvedValue({ id: 'doctor-1', role: 'DOCTOR' });
+      examService.delete.mockResolvedValue(undefined);
+
+      const response = await request(app)
+        .delete('/api/exams/exam-1')
+        .set('Authorization', 'Bearer valid-token');
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+    });
+  });
+
+  describe('Specialty Routes', () => {
+    it('GET /api/specialties deve retornar lista de especialidades', async () => {
+      const { authService, specialtyService } = require('../../src/services');
+
+      authService.verifyToken.mockReturnValue('user-1');
+      specialtyService.getAll.mockResolvedValue({
+        data: [{ id: 'spec-1', name: 'Cardiologia', isActive: true }],
+        total: 1,
+      });
+
+      const response = await request(app)
+        .get('/api/specialties')
+        .set('Authorization', 'Bearer valid-token');
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(specialtyService.getAll).toHaveBeenCalled();
+    });
+
+    it('POST /api/specialties deve criar especialidade (apenas ADMIN)', async () => {
+      const { authService, specialtyService, userService } = require('../../src/services');
+
+      authService.verifyToken.mockReturnValue('admin-1');
+      userService.getUserById.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
+      specialtyService.create.mockResolvedValue({ id: 'spec-1', name: 'Neurologia', isActive: true });
+
+      const response = await request(app)
+        .post('/api/specialties')
+        .set('Authorization', 'Bearer valid-token')
+        .send({ name: 'Neurologia' });
+
+      expect(response.status).toBe(201);
+      expect(response.body.success).toBe(true);
+      expect(specialtyService.create).toHaveBeenCalled();
+    });
+
+    it('PUT /api/specialties/:id deve atualizar especialidade', async () => {
+      const { authService, specialtyService, userService } = require('../../src/services');
+
+      authService.verifyToken.mockReturnValue('admin-1');
+      userService.getUserById.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
+      specialtyService.update.mockResolvedValue({ id: 'spec-1', name: 'Neurologia Clínica', isActive: true });
+
+      const response = await request(app)
+        .put('/api/specialties/spec-1')
+        .set('Authorization', 'Bearer valid-token')
+        .send({ name: 'Neurologia Clínica' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+    });
+  });
+
+  describe('Health Plan Routes', () => {
+    it('GET /api/health-plans deve retornar lista de convênios', async () => {
+      const { authService, healthPlanService } = require('../../src/services');
+
+      authService.verifyToken.mockReturnValue('user-1');
+      healthPlanService.getAll.mockResolvedValue({
+        data: [
+          {
+            id: 'plan-1',
+            planName: 'Plano Ouro',
+            provider: 'Unimed',
+            planNumber: '123456',
+            patientId: 'patient-1',
+          },
+        ],
+        total: 1,
+      });
+
+      const response = await request(app)
+        .get('/api/health-plans')
+        .set('Authorization', 'Bearer valid-token');
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(healthPlanService.getAll).toHaveBeenCalled();
+    });
+
+    it('POST /api/health-plans deve criar convênio', async () => {
+      const { authService, healthPlanService, userService } = require('../../src/services');
+
+      authService.verifyToken.mockReturnValue('user-1');
+      userService.getUserById.mockResolvedValue({ id: 'user-1', role: 'RECEPTIONIST' });
+      healthPlanService.create.mockResolvedValue({
+        id: 'plan-1',
+        planName: 'Plano Ouro',
+        provider: 'Unimed',
+        planNumber: '123456',
+        patientId: 'patient-1',
+      });
+
+      const response = await request(app)
+        .post('/api/health-plans')
+        .set('Authorization', 'Bearer valid-token')
+        .send({
+          planName: 'Plano Ouro',
+          provider: 'Unimed',
+          planNumber: '123456',
+          validUntil: '2026-12-31',
+          patientId: 'patient-1',
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body.success).toBe(true);
+      expect(healthPlanService.create).toHaveBeenCalled();
+    });
+  });
+
+  describe('ViaCEP Route', () => {
+    it('GET /api/address/cep/:cep deve retornar dados do endereço', async () => {
+      const { authService, viaCepService } = require('../../src/services');
+
+      authService.verifyToken.mockReturnValue('user-1');
+      viaCepService.lookupCEP.mockResolvedValue({
+        cep: '01310-100',
+        logradouro: 'Avenida Paulista',
+        bairro: 'Bela Vista',
+        localidade: 'São Paulo',
+        uf: 'SP',
+        address: 'Avenida Paulista, Bela Vista, São Paulo - SP',
+      });
+
+      const response = await request(app)
+        .get('/api/address/cep/01310100')
+        .set('Authorization', 'Bearer valid-token');
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.logradouro).toBeDefined();
+      expect(viaCepService.lookupCEP).toHaveBeenCalledWith('01310100');
     });
   });
 });

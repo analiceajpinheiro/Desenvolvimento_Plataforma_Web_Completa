@@ -91,3 +91,70 @@ export interface PaginatedResponse<T> {
   limit: number;
   pages: number;
 }
+
+// ===== SPRINT 3: NOVOS TIPOS =====
+
+export enum ExamType {
+  LAB = 'LAB',
+  IMAGE = 'IMAGE',
+  FUNCTIONAL = 'FUNCTIONAL',
+  OTHER = 'OTHER',
+}
+
+export enum ExamStatus {
+  REQUESTED = 'REQUESTED',
+  SCHEDULED = 'SCHEDULED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+}
+
+export interface Exam {
+  id: string;
+  name: string;
+  type: ExamType;
+  description?: string;
+  result?: string;
+  status: ExamStatus;
+  scheduledAt?: string;
+  completedAt?: string;
+  patientId: string;
+  doctorId: string;
+  patient?: Pick<Patient, 'id' | 'name' | 'cpf'>;
+  doctor?: Pick<User, 'id' | 'name' | 'specialty'>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Specialty {
+  id: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface HealthPlan {
+  id: string;
+  planName: string;
+  provider: string;
+  planNumber: string;
+  validUntil: string;
+  notes?: string;
+  isActive: boolean;
+  patientId: string;
+  patient?: Pick<Patient, 'id' | 'name' | 'cpf'>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ViaCepResponse {
+  cep: string;
+  logradouro: string;
+  complemento: string;
+  bairro: string;
+  localidade: string;
+  uf: string;
+  address: string;
+}

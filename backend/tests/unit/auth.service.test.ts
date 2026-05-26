@@ -1,6 +1,7 @@
 import { authService } from '../../src/services';
 import { UnauthorizedError, ConflictError } from '../../src/utils/errors';
 import * as userRepo from '../../src/repositories';
+import * as bcrypt from 'bcrypt';
 
 // Mock do repositório de usuário
 jest.mock('../../src/repositories', () => ({
@@ -11,6 +12,9 @@ jest.mock('../../src/repositories', () => ({
     update: jest.fn(),
   },
 }));
+
+// Mock do bcrypt
+jest.mock('bcrypt');
 
 describe('Auth Service', () => {
   beforeEach(() => {
@@ -86,10 +90,8 @@ describe('Auth Service', () => {
 
       (userRepo.userRepository.findByEmail as jest.Mock).mockResolvedValue(mockUser);
 
-      // Mock bcrypt
-      jest.mock('bcrypt', () => ({
-        compare: jest.fn().mockResolvedValue(true),
-      }));
+      // Mock bcrypt compare
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       const result = await authService.login(
         'dr.joao@example.com',
@@ -166,10 +168,9 @@ describe('Auth Service', () => {
         password: '$2b$10$newhashed',
       });
 
-      jest.mock('bcrypt', () => ({
-        compare: jest.fn().mockResolvedValue(true),
-        hash: jest.fn().mockResolvedValue('$2b$10$newhashed'),
-      }));
+      // Mock bcrypt
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (bcrypt.hash as jest.Mock).mockResolvedValue('$2b$10$newhashed');
 
       const result = await authService.changePassword(
         'user-1',
@@ -193,9 +194,8 @@ describe('Auth Service', () => {
 
       (userRepo.userRepository.findById as jest.Mock).mockResolvedValue(mockUser);
 
-      jest.mock('bcrypt', () => ({
-        compare: jest.fn().mockResolvedValue(false),
-      }));
+      // Mock bcrypt
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       await expect(
         authService.changePassword('user-1', 'SenhaErrada', 'SenhaNovaValida123')

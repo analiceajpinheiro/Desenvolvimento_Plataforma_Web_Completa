@@ -8,3 +8,10 @@ export { MedicalRecordsList } from './MedicalRecordsList';
 export { MedicalRecordsForm } from './MedicalRecordsForm';
 export { UsersList } from './UsersList';
 export { UsersForm } from './UsersForm';
+// Sprint 3
+export { ExamsList } from './ExamsList';
+export { ExamsForm } from './ExamsForm';
+export { SpecialtiesList } from './SpecialtiesList';
+export { SpecialtiesForm } from './SpecialtiesForm';
+export { HealthPlansList } from './HealthPlansList';
+export { HealthPlansForm } from './HealthPlansForm';

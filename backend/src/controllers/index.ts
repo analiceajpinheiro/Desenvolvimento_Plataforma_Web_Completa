@@ -4,6 +4,10 @@ import {
   userService,
   patientService,
   appointmentService,
+  examService,
+  specialtyService,
+  healthPlanService,
+  viaCepService,
 } from '../services';
 import { medicalRecordService } from '../services';
 import { prescriptionService } from '../services';
@@ -375,7 +379,8 @@ export const appointmentController = {
 
   async getAvailableSlots(req: Request, res: Response, next: NextFunction) {
     try {
-      const { doctorId, date } = req.query;
+      const { doctorId } = req.params;
+      const { date } = req.query;
 
       if (!doctorId || !date) {
         throw new ValidationError('doctorId e date são obrigatórios');
@@ -459,6 +464,209 @@ export const medicalRecordController = {
         success: true,
         message: 'Prontuário removido com sucesso',
       });
+    } catch (err) {
+      next(err);
+    }
+  },
+};
+
+// ===== EXAM CONTROLLER =====
+export const examController = {
+  async getAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const page = parseInt(req.query.page as string) || 1;
+      const skip = (page - 1) * limit;
+      const { patientId, doctorId, status } = req.query;
+
+      const result = await examService.getAll(limit, skip, {
+        ...(patientId && { patientId: patientId as string }),
+        ...(doctorId && { doctorId: doctorId as string }),
+        ...(status && { status: status as string }),
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: result.data,
+        pagination: {
+          page,
+          limit,
+          total: result.total,
+          totalPages: Math.ceil(result.total / limit),
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const exam = await examService.getById(req.params.id);
+      return res.status(200).json({ success: true, data: exam });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const exam = await examService.create(req.body);
+      return res.status(201).json({ success: true, message: 'Exame criado com sucesso', data: exam });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const exam = await examService.update(req.params.id, req.body);
+      return res.status(200).json({ success: true, message: 'Exame atualizado com sucesso', data: exam });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      await examService.delete(req.params.id);
+      return res.status(200).json({ success: true, message: 'Exame removido com sucesso' });
+    } catch (err) {
+      next(err);
+    }
+  },
+};
+
+// ===== SPECIALTY CONTROLLER =====
+export const specialtyController = {
+  async getAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const page = parseInt(req.query.page as string) || 1;
+      const skip = (page - 1) * limit;
+
+      const result = await specialtyService.getAll(limit, skip);
+      return res.status(200).json({
+        success: true,
+        data: result.data,
+        pagination: {
+          page,
+          limit,
+          total: result.total,
+          totalPages: Math.ceil(result.total / limit),
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const specialty = await specialtyService.getById(req.params.id);
+      return res.status(200).json({ success: true, data: specialty });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const specialty = await specialtyService.create(req.body);
+      return res.status(201).json({ success: true, message: 'Especialidade criada com sucesso', data: specialty });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const specialty = await specialtyService.update(req.params.id, req.body);
+      return res.status(200).json({ success: true, message: 'Especialidade atualizada com sucesso', data: specialty });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      await specialtyService.delete(req.params.id);
+      return res.status(200).json({ success: true, message: 'Especialidade desativada com sucesso' });
+    } catch (err) {
+      next(err);
+    }
+  },
+};
+
+// ===== HEALTH PLAN CONTROLLER =====
+export const healthPlanController = {
+  async getAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const page = parseInt(req.query.page as string) || 1;
+      const skip = (page - 1) * limit;
+      const patientId = req.query.patientId as string | undefined;
+
+      const result = await healthPlanService.getAll(limit, skip, patientId);
+      return res.status(200).json({
+        success: true,
+        data: result.data,
+        pagination: {
+          page,
+          limit,
+          total: result.total,
+          totalPages: Math.ceil(result.total / limit),
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const plan = await healthPlanService.getById(req.params.id);
+      return res.status(200).json({ success: true, data: plan });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const plan = await healthPlanService.create(req.body);
+      return res.status(201).json({ success: true, message: 'Convênio criado com sucesso', data: plan });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const plan = await healthPlanService.update(req.params.id, req.body);
+      return res.status(200).json({ success: true, message: 'Convênio atualizado com sucesso', data: plan });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      await healthPlanService.delete(req.params.id);
+      return res.status(200).json({ success: true, message: 'Convênio removido com sucesso' });
+    } catch (err) {
+      next(err);
+    }
+  },
+};
+
+// ===== VIA CEP CONTROLLER =====
+export const viaCepController = {
+  async lookup(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { cep } = req.params;
+      const addressData = await viaCepService.lookupCEP(cep);
+      return res.status(200).json({ success: true, data: addressData });
     } catch (err) {
       next(err);
     }

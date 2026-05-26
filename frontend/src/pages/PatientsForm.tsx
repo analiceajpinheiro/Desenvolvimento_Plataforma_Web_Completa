@@ -10,6 +10,7 @@ import {
   formatCPF,
   formatPhone,
 } from '../utils/validators';
+import { cepService } from '../services/healthPlanService';
 
 export const PatientsForm: React.FC = () => {
   const navigate = useNavigate();
@@ -28,6 +29,9 @@ export const PatientsForm: React.FC = () => {
     address: '',
   });
 
+  const [cepInput, setCepInput] = useState('');
+  const [cepLoading, setCepLoading] = useState(false);
+  const [cepError, setCepError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
@@ -100,6 +104,33 @@ export const PatientsForm: React.FC = () => {
         ...prev,
         [name]: '',
       }));
+    }
+  };
+
+  const handleCepLookup = async () => {
+    const cleaned = cepInput.replace(/\D/g, '');
+    if (cleaned.length !== 8) {
+      setCepError('CEP deve conter 8 dígitos');
+      return;
+    }
+    setCepLoading(true);
+    setCepError(null);
+    try {
+      const data = await cepService.lookupCEP(cleaned);
+      setFormData((prev) => ({ ...prev, address: data.address }));
+    } catch {
+      setCepError('CEP não encontrado. Verifique o número informado.');
+    } finally {
+      setCepLoading(false);
+    }
+  };
+
+  const handleCepInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 8);
+    setCepInput(value);
+    setCepError(null);
+    if (value.length === 8) {
+      handleCepLookup();
     }
   };
 
@@ -261,6 +292,31 @@ export const PatientsForm: React.FC = () => {
               required
             />
 
+            {/* CEP com busca automática via ViaCEP */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">CEP</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={cepInput}
+                  onChange={handleCepInputChange}
+                  placeholder="00000000"
+                  maxLength={8}
+                  className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={handleCepLookup}
+                  disabled={cepLoading}
+                  className="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {cepLoading ? '...' : 'Buscar'}
+                </button>
+              </div>
+              {cepError && <p className="mt-1 text-xs text-red-600">{cepError}</p>}
+              {cepLoading && <p className="mt-1 text-xs text-blue-600">Buscando endereço...</p>}
+            </div>
+
             {/* Endereço */}
             <div className="md:col-span-2">
               <Input
@@ -269,7 +325,7 @@ export const PatientsForm: React.FC = () => {
                 value={formData.address}
                 onChange={handleChange}
                 error={errors.address}
-                placeholder="Rua, número, bairro, cidade"
+                placeholder="Rua, número, bairro, cidade (ou use o CEP acima)"
                 required
               />
             </div>

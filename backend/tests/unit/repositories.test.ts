@@ -26,10 +26,53 @@ const mockPrismaClient = {
     delete: jest.fn(),
     count: jest.fn(),
   },
+  medicalRecord: {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  },
+  prescription: {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  },
+  exam: {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    count: jest.fn(),
+  },
+  specialty: {
+    findUnique: jest.fn(),
+    findFirst: jest.fn(),
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    count: jest.fn(),
+  },
+  healthPlan: {
+    findUnique: jest.fn(),
+    findFirst: jest.fn(),
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    count: jest.fn(),
+  },
 };
 
 jest.mock('@prisma/client', () => ({
   PrismaClient: jest.fn(() => mockPrismaClient),
+  Role: { DOCTOR: 'DOCTOR', RECEPTIONIST: 'RECEPTIONIST', ADMIN: 'ADMIN' },
+  ExamType: { LAB: 'LAB', IMAGE: 'IMAGE', FUNCTIONAL: 'FUNCTIONAL', OTHER: 'OTHER' },
+  ExamStatus: { REQUESTED: 'REQUESTED', SCHEDULED: 'SCHEDULED', IN_PROGRESS: 'IN_PROGRESS', COMPLETED: 'COMPLETED', CANCELLED: 'CANCELLED' },
 }));
 
 import { userRepository, patientRepository, appointmentRepository } from '../../src/repositories';
