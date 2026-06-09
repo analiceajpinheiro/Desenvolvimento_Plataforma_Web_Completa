@@ -1,4 +1,4 @@
-# VitaCase — Plataforma de Gestão em Saúde
+# VitaLink — Plataforma de Gestão em Saúde
 
 > Plataforma web completa para gerenciamento de consultas, pacientes, prontuários e monitoramento de saúde.
 
